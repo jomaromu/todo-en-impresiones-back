@@ -3,7 +3,6 @@ import { CallbackError } from 'mongoose';
 import { nanoid } from 'nanoid';
 
 // Clases
-import { BitacoraClass } from './bitacoraClass';
 import { GestorCarpetaClass } from './gestorCarpetaClass';
 
 import moment from 'moment';
@@ -113,6 +112,17 @@ export class ArchivoClass {
                                 return resp.json({
                                     ok: false,
                                     mensaje: `No se encontró un pedido para anexar un archivo`
+                                });
+                            }
+
+                            if (pedidoDB.productos_pedidos.length <= 0) {
+
+                                eliminarArchivo(nombre_archivo);
+                                await archivosModel.findByIdAndDelete(archivoDB._id);
+
+                                return resp.json({
+                                    ok: false,
+                                    mensaje: `Debe agregar un producto para poder crear archivos`
                                 });
                             }
 

@@ -13,6 +13,8 @@ const productoPedidoSchema = new Schema({
     seguimiento_disenio: { type: String },
     seguimiento_produccion: { type: String },
     producto: { type: Schema.Types.ObjectId, ref: 'products' },
+    estado: { type: Boolean, default: false },
+    pedido: { type: mongoose.Types.ObjectId, ref: 'pedidos' },
     inhabilitado: { type: Boolean, default: false },
 });
 

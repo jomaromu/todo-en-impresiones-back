@@ -7,7 +7,7 @@
 - Hacer cast de los estados **
 - Hacer validaciones en montos de pagos **
 - Cuando elimino sucursal actualizar todo lo que tenga sucursal, usuario y todas las colecciones que tengan relaciones
-- Producto no tiene ayuda, crear nueva collecion de ayuda (Productos)
+- Producto no tiene ayuda, crear nueva collecion de ayuda (Productos) **
 - Editar producto pedido: terminarlo **
 
 // CONSULTAS
@@ -26,6 +26,10 @@ si se hace un pago, no se puede borrar productos pedidos
 // Trabajar los true/false de todas las colecciones **
 // Mostrar todo lo que es true **
 // Telefonos en string **
+// Cuando se elimine un pedido, eliminar los productos pedidos y los pagos de ese pedido **
+// Hacer cast de todos los precios **
+// Cuando se ha hecho pagos no se pueden deshabilitar, ni eliminar productos pedidos **
+// validar que todo los objetos existan antes de editarlos o eliminarlos
 
 crear categoria de productos **
 productos no pertenecen a una sucursal **

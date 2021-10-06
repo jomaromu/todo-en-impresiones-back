@@ -4,9 +4,6 @@ import moment from 'moment';
 import { UploadedFile } from 'express-fileupload';
 moment.locale('es');
 
-// Clases
-import { BitacoraClass } from './bitacoraClass';
-
 // Intefaces
 import { PagoInterface } from '../interfaces/pago';
 import { PedidoModelInterface } from '../interfaces/pedidos';
@@ -48,6 +45,14 @@ export class PagoClass {
                     });
                 }
 
+                if (pedidoDB.productos_pedidos.length <= 0) {
+
+                    return resp.json({
+                        ok: false,
+                        mensaje: `Debe agregar un producto para poder realizar un pago`
+                    });
+                }
+
                 // Cuando no hay productos pedidos
                 const productosPedidos: Array<any> = pedidoDB.productos_pedidos;
                 const pagosPedidos: Array<any> = pedidoDB.pagos_pedido;
@@ -82,10 +87,13 @@ export class PagoClass {
 
         const idCreador = req.usuario._id;
         const metodo = req.get('metodo');
-        const monto: number = Number(req.body.monto);
+        const montoBody = Number(req.body.monto);
+        const monto: number = parseFloat(montoBody.toFixed(2));
         const modalidad = req.body.modalidad;
         const files: UploadedFile = req.files;
         const fecha = moment().format('YYYY-MM-DD');
+
+        const query = {};
 
         // console.log(files);
         // return;
@@ -114,7 +122,7 @@ export class PagoClass {
 
             } else {
 
-                let saldo: number = 0;
+                let total: number = 0;
                 const nombre_archivo = resArch.mensaje;
 
                 const nuevoPago = new pagosModel({
@@ -135,14 +143,15 @@ export class PagoClass {
                     });
                 }
 
-                saldo = pedidoDB.saldo - monto;
+                total = parseFloat((pedidoDB.total - monto).toFixed(2));
+                // total -= monto;
 
-                if (saldo < 0) {
+                if (total < 0.00) {
 
                     eliminarArchivo(nombre_archivo);
                     return resp.json({
                         ok: false,
-                        mensaje: `El monto de pago supera el saldo pendiente, Saldo: ${pedidoDB.saldo}`
+                        mensaje: `El monto de pago (${monto.toFixed(2)}) supera el total pendiente, Total pendiente: ${(pedidoDB.total).toFixed(2)}`
                     });
 
                 } else {
@@ -158,7 +167,9 @@ export class PagoClass {
                             });
                         }
 
-                        pedidoModel.findByIdAndUpdate(idPedido, { $push: { pagos_pedido: pagoDB._id }, saldo: saldo }, { new: true })
+                        Object.assign(query, { $push: { pagos_pedido: pagoDB._id }, total: total, monto_itbms: 0, subtotal: 0 });
+
+                        pedidoModel.findByIdAndUpdate(idPedido, query, { new: true })
                             .populate('pagos_pedido')
                             .exec(async (err: CallbackError, pedidoActualizadoDB: any) => {
 
@@ -269,6 +280,8 @@ export class PagoClass {
 
             pagosModel.findById(id, (err: CallbackError, pagoDB: PagoInterface) => {
 
+                let total: number = 0;
+
                 if (err) {
                     return resp.json({
                         ok: false,
@@ -298,7 +311,8 @@ export class PagoClass {
 
                 } else if (pagoDB.estado === false && estado === true) {
 
-                    saldo = pedidoDB.saldo - pagoDB.monto;
+                    // saldo = pedidoDB.total - pagoDB.monto;
+                    total = parseFloat((total + pagoDB.monto).toFixed(2));
                 }
 
                 // Cuando el pago va a ser deshabilitado
@@ -318,7 +332,9 @@ export class PagoClass {
                         });
                     }
 
-                    saldo = pedidoDB.saldo + pagoDB.monto;
+                    // saldo = pedidoDB.saldo + pagoDB.monto;
+                    total = parseFloat((pedidoDB.total - pagoDB.monto).toFixed(2));
+
                 }
 
                 pagosModel.findByIdAndUpdate(id, { estado: estado, motivo: motivo }, { new: true }, (err: CallbackError, pagoActualizadoDB: any) => {
@@ -331,7 +347,7 @@ export class PagoClass {
                         });
                     }
 
-                    pedidoModel.findByIdAndUpdate(pedido, { saldo: saldo }, { new: true })
+                    pedidoModel.findByIdAndUpdate(pedido, { total: total }, { new: true })
                         .exec(async (err: CallbackError, pedidoActualizadoDB: any) => {
 
                             if (err) {

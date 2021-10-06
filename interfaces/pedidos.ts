@@ -21,10 +21,12 @@ export interface PedidoModelInterface {
     origen_pedido: OrigenPedidoInterface;
     productos_pedidos: Array<ProductoPedidoInterface>;
     pagos_pedido: Array<PagoInterface>;
-    estado_pedido: String;
+    estado_pedido: string;
     estado: boolean;
     itbms: boolean;
-    saldo: number;
+    monto_itbms: number;
+    subTotal: number;
+    total: number;
 }
 
 export interface ArchivosInterface {
@@ -67,5 +69,14 @@ export interface ProductoPedidoInterface {
     producto: ProductModelInterface;
     seguimiento_disenio: string;
     seguimiento_produccion: string;
+    inhabilitado: boolean;
     estado: boolean;
+}
+
+export interface ActualizarMontosPedido {
+
+    subtotal: number;
+    monto_itbms: number;
+    total: number;
+
 }

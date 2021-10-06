@@ -30,7 +30,9 @@ const PedidoSchema = new Schema({
     estado: { type: Boolean, default: true },
     estado_pedido: { type: String, default: 'normal', enum: estadoPedido },
     itbms: { type: Boolean, default: false },
-    saldo: { type: Number, default: 0 }
+    monto_itbms: { type: Number, default: 0 },
+    subtotal: { type: Number, default: 0 },
+    total: { type: Number, default: 0 }
 });
 
 // validacion para único elemento

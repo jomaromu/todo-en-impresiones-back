@@ -1,8 +1,6 @@
 import { Response, Request } from 'express';
 import moment from 'moment';
 import { CallbackError } from 'mongoose';
-import path from 'path';
-import fs from 'fs';
 import { nanoid } from 'nanoid'
 
 
@@ -10,7 +8,6 @@ import { nanoid } from 'nanoid'
 import productModel from '../models/productModel';
 
 // Funciones externas
-import { archivoJson, directorios } from '../functions/directorios';
 import { castEstado } from '../functions/castEstado';
 
 // Interfaces
@@ -30,7 +27,9 @@ export class Product {
 
         const idCreador: string = req.usuario._id;
         const nombre: string = req.body.nombre;
-        const precio: number = Number(req.body.precio);
+
+        const precio: number = Number(parseFloat(req.body.precio).toFixed(2));
+
         const descripcion: string = req.body.descripcion;
         const sucursal: string = req.get('sucursal');
         const fecha = moment().format('MMM Do YY');

@@ -9,6 +9,19 @@ const castEstado = (estado: string): boolean => {
     }
 }
 
+
+const castITBMS = (ibtms: string): boolean => {
+
+    if (ibtms === 'false') {
+        return false;
+    } else if (ibtms === 'true') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export {
-    castEstado
+    castEstado,
+    castITBMS
 }

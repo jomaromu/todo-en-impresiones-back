@@ -17,7 +17,7 @@ import { PedidoModelInterface } from '../interfaces/pedidos';
 import { BitacoraClass } from './bitacoraClass';
 
 // Funciones
-import { castEstado } from '../functions/castEstado';
+import { castEstado, castITBMS } from '../functions/castEstado';
 
 export class PedidosClass {
 
@@ -84,8 +84,12 @@ export class PedidosClass {
         const estado_pedido = req.body.estado_pedido;
         const itbms = req.body.itbms;
 
+        let montoItbms: number = 0;
+        let total: number = 0;
+
         const estadoHeader: string = req.get('estado');
         const estado: boolean = castEstado(estadoHeader);
+        const itbm_s: boolean = castITBMS(itbms);
 
         const bitacora = new BitacoraClass();
 
@@ -95,6 +99,25 @@ export class PedidosClass {
             .populate('prioridad_pedido')
             .populate('asignado_a')
             .exec();
+
+        if (pedidoDB.productos_pedidos.length <= 0) {
+
+            return resp.json({
+                ok: false,
+                mensaje: `Debe agregar un producto para poder editar un pedido`
+            });
+        }
+
+        if (pedidoDB.itbms !== itbm_s) {
+
+            // Existen pagos
+            if (pedidoDB.pagos_pedido.length > 0) {
+                return resp.json({
+                    ok: false,
+                    mensaje: `No puede editar el pedido ya que existen pagos registrados`
+                });
+            }
+        }
 
         const query = {
             sucursal: sucursal,
@@ -128,6 +151,18 @@ export class PedidosClass {
 
         if (!query.itbms) {
             query.itbms = pedidoDB.itbms;
+        } else {
+
+            if (itbm_s === true) {
+
+                montoItbms = parseFloat((pedidoDB.subtotal * 0.07).toFixed(2));
+                total = parseFloat((pedidoDB.subtotal + montoItbms).toFixed(2));
+                Object.assign(query, { monto_itbms: montoItbms, total: total });
+
+            } else if (itbm_s === false) {
+
+                Object.assign(query, { monto_itbms: 0, total: (pedidoDB.subtotal + 0) });
+            }
         }
 
         if (!query.estado_pedido) {
@@ -167,9 +202,13 @@ export class PedidosClass {
                     await bitacora.crearBitacora(req, `Asginó el pedido a ${pedidoActualizadoDB.asignado_a.nombre}`, pedidoDB._id);
                 }
 
+                if (query.estado_pedido) {
+                    await bitacora.crearBitacora(req, `Cambió el estado del pedido a ${pedidoActualizadoDB.estado_pedido}`, pedidoDB._id);
+                }
+
                 return resp.json({
                     pedidoActualizadoDB,
-                    pedidoDB: pedidoDB
+                    // pedidoDB: pedidoDB
                 });
             });
     }
