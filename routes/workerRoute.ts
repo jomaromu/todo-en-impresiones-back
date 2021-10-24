@@ -138,4 +138,23 @@ workerRouter.post('/loguearUsuario', (req: Request, resp: Response) => {
     loguearUsuario.loguearUsuario(req, resp);
 });
 
+// ==================================================================== //
+// Decodificar token
+// ==================================================================== //
+workerRouter.get('/decodificarToken', (req: Request, resp: Response) => {
+    
+    const decodificarToken = new WorkkerClass();
+    decodificarToken.decodificarToken(req, resp);
+});
+
+// ==================================================================== //
+// Refrescar token
+// ==================================================================== //
+workerRouter.post('/refrescarToken', (req: Request, resp: Response) => {
+    
+    const refrescarToken = new WorkkerClass();
+    refrescarToken.refrescarToken(req, resp);
+});
+
+
 export default workerRouter;

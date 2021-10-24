@@ -767,7 +767,7 @@ export class WorkkerClass {
 
                     // Crear token
                     usuarioFechaDB.password = ':)';
-                    this.token = jwt.sign({ usuario: usuarioFechaDB }, environmnet.SEED, { expiresIn: 3600 }); // Token válido por una hora
+                    this.token = jwt.sign({ usuario: usuarioFechaDB }, environmnet.SEED, { expiresIn: 3600 }); // Token válido por una hora 3600
 
                     return resp.json({
                         ok: true,
@@ -781,6 +781,69 @@ export class WorkkerClass {
             });
 
         });
+    }
+
+    decodificarToken(req: any, resp: Response): void {
+
+        const token = req.get('token');
+
+        // Comprobación del token
+        jwt.verify(token, environmnet.SEED, (err: any, decoded: any) => {
+
+            if (err) {
+                return resp.json({
+                    ok: false,
+                    mensaje: `Token incorrecto`,
+                    err
+                });
+
+            } else {
+                return resp.json({
+                    ok: true,
+                    mensaje: `Token correcto`,
+                    usuario: decoded.usuario,
+                    token,
+                    iat: decoded.iat,
+                    exp: decoded.exp,
+                })
+            }
+        });
+    }
+
+    refrescarToken(req: Request, resp: Response): void {
+
+        const idUsuario = req.body.idUsuario;
+
+        workerModel.findById(idUsuario, (err: CallbackError, usuarioDB: WorkerModelInterface) => {
+
+            if (err) {
+                return resp.json({
+                    ok: false,
+                    mensaje: `Error interno`,
+                    err
+                });
+            }
+
+            if (!usuarioDB) {
+                return resp.json({
+                    ok: false,
+                    mensaje: `No existe un usuario ${idUsuario}`
+                });
+            }
+
+            // Crear token
+            usuarioDB.password = ':)';
+            this.token = jwt.sign({ usuario: usuarioDB }, environmnet.SEED, { expiresIn: 3600 }); // Token válido por una hora
+
+            return resp.json({
+                ok: true,
+                mensaje: `Acceso correcto`,
+                usuarioDB,
+                token: this.token
+            });
+
+        });
+
     }
 }
 
