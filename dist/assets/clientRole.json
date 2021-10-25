@@ -1,0 +1,34 @@
+{
+    "clientRole": [
+        {
+            "_id": "role-01",
+            "nombre": "ComunRole",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "role-02",
+            "nombre": "EmpresaRole",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "role-03",
+            "nombre": "EmpresaVIPRole",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "role-04",
+            "nombre": "ComunVIPRole",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "role-05",
+            "nombre": "ComunFrecuenteRole",
+            "estado": true,
+            "nivel": 0
+        }
+    ]
+}

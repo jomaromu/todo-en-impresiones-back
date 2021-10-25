@@ -1,0 +1,22 @@
+{
+    "clientRole": [
+        {
+            "_id": "mod-01",
+            "nombre": "abono",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "mod-02",
+            "nombre": "cancelacion",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "mod-03",
+            "nombre": "delivery",
+            "estado": true,
+            "nivel": 0
+        }
+    ]
+}

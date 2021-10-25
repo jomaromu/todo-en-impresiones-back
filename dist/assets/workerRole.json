@@ -1,0 +1,46 @@
+{
+    "clientRole": [
+        {
+            "_id": "role-06",
+            "nombre": "SuperRole",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "role-07",
+            "nombre": "AdminRole",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "role-08",
+            "nombre": "ProduccionVIPRole",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "role-09",
+            "nombre": "ProduccionNormalRole",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "role-10",
+            "nombre": "VendedorVIPRole",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "role-10",
+            "nombre": "VendedorNormalRole",
+            "estado": true,
+            "nivel": 0
+        },
+        {
+            "_id": "role-10",
+            "nombre": "DiseniadorRole",
+            "estado": true,
+            "nivel": 0
+        }
+    ]
+}
