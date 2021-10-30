@@ -116,7 +116,7 @@ class RoleClientClass {
     obtenerTodos(req, resp) {
         const estadoHeader = req.get('estado');
         const estado = (0, castEstado_1.castEstado)(estadoHeader);
-        roleClientModel_1.default.find({ estado: estado }, (err, roleDB) => {
+        roleClientModel_1.default.find({ estado: estado }, (err, rolesDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
@@ -124,7 +124,7 @@ class RoleClientClass {
                     err
                 });
             }
-            if (!roleDB || roleDB.length === 0) {
+            if (!rolesDB || rolesDB.length === 0) {
                 return resp.json({
                     ok: false,
                     mensaje: `No existen el role en la base de datos`
@@ -132,7 +132,7 @@ class RoleClientClass {
             }
             return resp.json({
                 ok: true,
-                roleDB
+                rolesDB
             });
         });
     }

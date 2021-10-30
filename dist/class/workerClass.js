@@ -144,6 +144,7 @@ class WorkkerClass {
             telefono: req.body.telefono,
             sucursal: req.body.sucursal,
             estado: req.body.estado,
+            identificacion: req.body.identificacion,
             colaborador_role: colaborador_role,
         };
         workerModel_1.default.findById(id, (err, usuarioDB) => {
@@ -276,7 +277,7 @@ class WorkkerClass {
     // Obtener usuario por ID
     obtenerUsuarioID(req, res) {
         const id = req.get('id') || '';
-        workerModel_1.default.findById(id, (err, usuarioDB) => {
+        workerModel_1.default.findById(id, (err, usuario) => {
             if (err) {
                 return res.json({
                     ok: false,
@@ -284,13 +285,13 @@ class WorkkerClass {
                     err
                 });
             }
-            if (!usuarioDB) {
+            if (!usuario) {
                 return res.json({
                     ok: false,
                     mensaje: `No existe el Usuario en la base de datos`
                 });
             }
-            const resultado = (0, nivelWorker_1.evaluaRole)(req.usuario.colaborador_role, usuarioDB.colaborador_role);
+            const resultado = (0, nivelWorker_1.evaluaRole)(req.usuario.colaborador_role, usuario.colaborador_role);
             if (resultado === 0) {
                 return res.json({
                     ok: false,
@@ -300,7 +301,7 @@ class WorkkerClass {
             else if (resultado === 1) {
                 return res.json({
                     ok: true,
-                    usuarioDB
+                    usuario
                 });
             }
         });
@@ -517,7 +518,7 @@ class WorkkerClass {
         const estadoHeader = req.get('estado');
         const estado = (0, castEstado_1.castEstado)(estadoHeader);
         const id = req.usuario._id;
-        workerModel_1.default.find({ $and: [{ _id: { $ne: id } }, { estado: estado }] }, (err, usuariosDB) => {
+        workerModel_1.default.find({ $and: [{ _id: { $ne: id }, colaborador_role: { $ne: 'SuperRole' } }] }, (err, usuariosDB) => {
             if (err) {
                 return res.json({
                     ok: false,

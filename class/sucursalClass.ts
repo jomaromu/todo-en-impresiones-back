@@ -78,17 +78,25 @@ export class Sucursal {
         const pais: string = req.body.pais;
         const ciudad: string = req.body.ciudad;
         const direccion: string = req.body.direccion;
-        
-        const estadoHeader: string = req.get('estado');
-        const estado: boolean = castEstado(estadoHeader);
+
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
+
+        const estado: boolean = req.get('estado');
+
+
+        // console.log(estado);
 
         const query = {
 
             nombre: nombre,
             telefono: telefono,
-            pais: pais,
-            ciudad: ciudad,
-            direccion: direccion,
+            ubicacion: {
+
+                pais: pais,
+                ciudad: ciudad,
+                direccion: direccion
+            },
             estado: estado
         }
 
@@ -109,22 +117,22 @@ export class Sucursal {
                 });
             }
 
-            if (query.nombre) {
+            if (!query.nombre) {
                 query.nombre = sucursalDB.nombre;
             }
-            if (query.telefono) {
+            if (!query.telefono) {
                 query.telefono = sucursalDB.telefono;
             }
-            if (query.pais) {
-                query.pais = sucursalDB.ubicacion.pais;
+            if (!query.ubicacion.pais) {
+                query.ubicacion.pais = sucursalDB.ubicacion.pais;
             }
-            if (query.ciudad) {
-                query.ciudad = sucursalDB.ubicacion.ciudad;
+            if (!query.ubicacion.ciudad) {
+                query.ubicacion.ciudad = sucursalDB.ubicacion.ciudad;
             }
-            if (query.direccion) {
-                query.direccion = sucursalDB.ubicacion.direccion;
+            if (!query.ubicacion.direccion) {
+                query.ubicacion.direccion = sucursalDB.ubicacion.direccion;
             }
-            if (query.estado) {
+            if (!query.estado) {
                 query.estado = sucursalDB.estado;
             }
 
@@ -220,7 +228,7 @@ export class Sucursal {
         const estadoHeader: string = req.get('estado');
         const estado: boolean = castEstado(estadoHeader);
 
-        sucursalModel.find({ estado: estado }, (err: CallbackError, sucursalesDB: Document) => {
+        sucursalModel.find({}, (err: CallbackError, sucursalesDB: Document) => { // estado: estado
 
             if (err) {
                 return resp.json({
@@ -250,24 +258,24 @@ export class Sucursal {
 
         const id = req.get('id');
 
-        // Eliminar ID actual de IDsJson.json
-        const eliminarIDActual = (idRef: string) => {
+        // // Eliminar ID actual de IDsJson.json
+        // const eliminarIDActual = (idRef: string) => {
 
-            const pathIDsJson = path.resolve(__dirname, `../uploads/assets/${this.sucursalIDs}`);
+        //     const pathIDsJson = path.resolve(__dirname, `../uploads/assets/${this.sucursalIDs}`);
 
-            const archivo: any = fs.readFileSync(`${pathIDsJson}`);
-            const archiObj: Archivo = JSON.parse(archivo);
+        //     const archivo: any = fs.readFileSync(`${pathIDsJson}`);
+        //     const archiObj: Archivo = JSON.parse(archivo);
 
-            const nuevoArray = archiObj.ids.filter(id => {
-                return id !== idRef;
-            });
+        //     const nuevoArray = archiObj.ids.filter(id => {
+        //         return id !== idRef;
+        //     });
 
-            archiObj.ids = nuevoArray;
+        //     archiObj.ids = nuevoArray;
 
-            const nuevoArhivo = JSON.stringify(archiObj);
-            fs.writeFileSync(`${pathIDsJson}`, nuevoArhivo);
+        //     const nuevoArhivo = JSON.stringify(archiObj);
+        //     fs.writeFileSync(`${pathIDsJson}`, nuevoArhivo);
 
-        }
+        // }
 
 
         sucursalModel.findByIdAndDelete(id, {}, (err: CallbackError, sucursalDB) => {
@@ -288,8 +296,8 @@ export class Sucursal {
 
             }
 
-            const idRef = sucursalDB?.idReferencia || '';
-            eliminarIDActual(idRef);
+            // const idRef = sucursalDB?.idReferencia || '';
+            // eliminarIDActual(idRef);
 
             return resp.json({
                 ok: true,

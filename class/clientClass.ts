@@ -94,6 +94,7 @@ export class ClientClass {
             observacion: req.body.observacion,
             sucursal: req.body.sucursal,
             estado: estado,
+            client_role: req.get('client_role'),
         }
 
         clientModel.findById(id, (err: CallbackError, usuarioDB: ClientModelInterface) => {
@@ -136,6 +137,9 @@ export class ClientClass {
             }
             if (!req.body.estado) {
                 datosNuevos.estado = usuarioDB.estado;
+            }
+            if (!datosNuevos.client_role) {
+                datosNuevos.client_role = usuarioDB.client_role;
             }
 
             clientModel.findByIdAndUpdate(id, datosNuevos, { new: true }, (err: CallbackError, usuarioDBActualizado: any) => {
@@ -425,7 +429,7 @@ export class ClientClass {
 
         const estado = castEstado(estadoHeader);
 
-        clientModel.find({ estado: estado }, (err: CallbackError, usuariosDB: Array<ClientModelInterface>) => {
+        clientModel.find({}, (err: CallbackError, usuariosDB: Array<ClientModelInterface>) => { // estado: estado
 
             if (err) {
                 return res.json({

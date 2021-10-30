@@ -74,10 +74,10 @@ export class RoleColClass {
             }
 
 
-            if (query.nombre) {
+            if (!query.nombre) {
                 query.nombre = roleDB.nombre;
             }
-            if (query.nivel) {
+            if (!query.nivel) {
                 query.nivel = roleDB.nivel;
             }
             if (!query.estado) {
@@ -146,7 +146,7 @@ export class RoleColClass {
         const estadoHeader: string = req.get('estado');
         const estado: boolean = castEstado(estadoHeader);
 
-        roleWorkerModel.find({ estado: estado }, (err: CallbackError, roleDB: Array<Document>) => {
+        roleWorkerModel.find({ estado: estado }, (err: CallbackError, rolesDB: Array<Document>) => {
 
             if (err) {
                 return resp.json({
@@ -156,16 +156,16 @@ export class RoleColClass {
                 });
             }
 
-            if (!roleDB || roleDB.length === 0) {
+            if (!rolesDB || rolesDB.length === 0) {
                 return resp.json({
                     ok: false,
-                    mensaje: `No existen el role en la base de datos`
+                    mensaje: `No existen roles en la base de datos`
                 });
             }
 
             return resp.json({
                 ok: true,
-                roleDB
+                rolesDB
             });
         });
     }

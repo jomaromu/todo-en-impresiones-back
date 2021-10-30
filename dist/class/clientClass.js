@@ -83,6 +83,7 @@ class ClientClass {
             observacion: req.body.observacion,
             sucursal: req.body.sucursal,
             estado: estado,
+            client_role: req.get('client_role'),
         };
         clientModel_1.default.findById(id, (err, usuarioDB) => {
             if (err) {
@@ -121,6 +122,9 @@ class ClientClass {
             }
             if (!req.body.estado) {
                 datosNuevos.estado = usuarioDB.estado;
+            }
+            if (!datosNuevos.client_role) {
+                datosNuevos.client_role = usuarioDB.client_role;
             }
             clientModel_1.default.findByIdAndUpdate(id, datosNuevos, { new: true }, (err, usuarioDBActualizado) => {
                 if (err) {
@@ -339,7 +343,7 @@ class ClientClass {
         const id = req.usuario._id;
         const estadoHeader = req.get('estado');
         const estado = (0, castEstado_1.castEstado)(estadoHeader);
-        clientModel_1.default.find({ estado: estado }, (err, usuariosDB) => {
+        clientModel_1.default.find({}, (err, usuariosDB) => {
             if (err) {
                 return res.json({
                     ok: false,

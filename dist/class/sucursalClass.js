@@ -5,8 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Sucursal = void 0;
 const moment_1 = __importDefault(require("moment"));
-const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
 const nanoid_1 = require("nanoid");
 // Modelo
 const sucursalModel_1 = __importDefault(require("../models/sucursalModel"));
@@ -64,14 +62,18 @@ class Sucursal {
         const pais = req.body.pais;
         const ciudad = req.body.ciudad;
         const direccion = req.body.direccion;
-        const estadoHeader = req.get('estado');
-        const estado = (0, castEstado_1.castEstado)(estadoHeader);
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
+        const estado = req.get('estado');
+        // console.log(estado);
         const query = {
             nombre: nombre,
             telefono: telefono,
-            pais: pais,
-            ciudad: ciudad,
-            direccion: direccion,
+            ubicacion: {
+                pais: pais,
+                ciudad: ciudad,
+                direccion: direccion
+            },
             estado: estado
         };
         sucursalModel_1.default.findById(id, (err, sucursalDB) => {
@@ -88,22 +90,22 @@ class Sucursal {
                     mensaje: `No se encontró una sucursal con ese ID en la base de datos`
                 });
             }
-            if (query.nombre) {
+            if (!query.nombre) {
                 query.nombre = sucursalDB.nombre;
             }
-            if (query.telefono) {
+            if (!query.telefono) {
                 query.telefono = sucursalDB.telefono;
             }
-            if (query.pais) {
-                query.pais = sucursalDB.ubicacion.pais;
+            if (!query.ubicacion.pais) {
+                query.ubicacion.pais = sucursalDB.ubicacion.pais;
             }
-            if (query.ciudad) {
-                query.ciudad = sucursalDB.ubicacion.ciudad;
+            if (!query.ubicacion.ciudad) {
+                query.ubicacion.ciudad = sucursalDB.ubicacion.ciudad;
             }
-            if (query.direccion) {
-                query.direccion = sucursalDB.ubicacion.direccion;
+            if (!query.ubicacion.direccion) {
+                query.ubicacion.direccion = sucursalDB.ubicacion.direccion;
             }
-            if (query.estado) {
+            if (!query.estado) {
                 query.estado = sucursalDB.estado;
             }
             sucursalModel_1.default.findByIdAndUpdate(id, query, { new: true }, (err, sucursalDBActualizada) => {
@@ -179,7 +181,7 @@ class Sucursal {
     obtenerTodas(req, resp) {
         const estadoHeader = req.get('estado');
         const estado = (0, castEstado_1.castEstado)(estadoHeader);
-        sucursalModel_1.default.find({ estado: estado }, (err, sucursalesDB) => {
+        sucursalModel_1.default.find({}, (err, sucursalesDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
@@ -202,18 +204,18 @@ class Sucursal {
     // Eliminar una sucursal
     eliminarSucursal(req, resp) {
         const id = req.get('id');
-        // Eliminar ID actual de IDsJson.json
-        const eliminarIDActual = (idRef) => {
-            const pathIDsJson = path_1.default.resolve(__dirname, `../uploads/assets/${this.sucursalIDs}`);
-            const archivo = fs_1.default.readFileSync(`${pathIDsJson}`);
-            const archiObj = JSON.parse(archivo);
-            const nuevoArray = archiObj.ids.filter(id => {
-                return id !== idRef;
-            });
-            archiObj.ids = nuevoArray;
-            const nuevoArhivo = JSON.stringify(archiObj);
-            fs_1.default.writeFileSync(`${pathIDsJson}`, nuevoArhivo);
-        };
+        // // Eliminar ID actual de IDsJson.json
+        // const eliminarIDActual = (idRef: string) => {
+        //     const pathIDsJson = path.resolve(__dirname, `../uploads/assets/${this.sucursalIDs}`);
+        //     const archivo: any = fs.readFileSync(`${pathIDsJson}`);
+        //     const archiObj: Archivo = JSON.parse(archivo);
+        //     const nuevoArray = archiObj.ids.filter(id => {
+        //         return id !== idRef;
+        //     });
+        //     archiObj.ids = nuevoArray;
+        //     const nuevoArhivo = JSON.stringify(archiObj);
+        //     fs.writeFileSync(`${pathIDsJson}`, nuevoArhivo);
+        // }
         sucursalModel_1.default.findByIdAndDelete(id, {}, (err, sucursalDB) => {
             if (err) {
                 return resp.json({
@@ -228,8 +230,8 @@ class Sucursal {
                     mensaje: `No existe la sucursal que desea eliminar`
                 });
             }
-            const idRef = (sucursalDB === null || sucursalDB === void 0 ? void 0 : sucursalDB.idReferencia) || '';
-            eliminarIDActual(idRef);
+            // const idRef = sucursalDB?.idReferencia || '';
+            // eliminarIDActual(idRef);
             return resp.json({
                 ok: true,
                 mensaje: `Sucursal eliminada`,

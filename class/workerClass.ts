@@ -161,6 +161,7 @@ export class WorkkerClass {
             telefono: req.body.telefono,
             sucursal: req.body.sucursal,
             estado: req.body.estado,
+            identificacion: req.body.identificacion,
             colaborador_role: colaborador_role,
         }
 
@@ -324,7 +325,7 @@ export class WorkkerClass {
 
         const id = req.get('id') || '';
 
-        workerModel.findById(id, (err: CallbackError, usuarioDB: any) => {
+        workerModel.findById(id, (err: CallbackError, usuario: any) => {
 
             if (err) {
                 return res.json({
@@ -334,14 +335,14 @@ export class WorkkerClass {
                 });
             }
 
-            if (!usuarioDB) {
+            if (!usuario) {
                 return res.json({
                     ok: false,
                     mensaje: `No existe el Usuario en la base de datos`
                 });
             }
 
-            const resultado = evaluaRole(req.usuario.colaborador_role, usuarioDB.colaborador_role);
+            const resultado = evaluaRole(req.usuario.colaborador_role, usuario.colaborador_role);
 
             if (resultado === 0) {
 
@@ -354,7 +355,7 @@ export class WorkkerClass {
 
                 return res.json({
                     ok: true,
-                    usuarioDB
+                    usuario
                 });
             }
         });
@@ -646,7 +647,7 @@ export class WorkkerClass {
 
         const id = req.usuario._id;
 
-        workerModel.find({ $and: [{ _id: { $ne: id } }, { estado: estado }] }, (err: CallbackError, usuariosDB: Array<WorkerModelInterface>) => {
+        workerModel.find({ $and: [{ _id: { $ne: id }, colaborador_role: { $ne: 'SuperRole' } }] }, (err: CallbackError, usuariosDB: Array<WorkerModelInterface>) => { // { estado: estado }
 
             if (err) {
                 return res.json({

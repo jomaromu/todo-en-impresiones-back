@@ -151,7 +151,7 @@ export class RoleClientClass {
         const estadoHeader: string = req.get('estado');
         const estado: boolean = castEstado(estadoHeader);
 
-        roleClientModel.find({ estado: estado }, (err: CallbackError, roleDB: Array<Document>) => {
+        roleClientModel.find({ estado: estado }, (err: CallbackError, rolesDB: Array<Document>) => {
 
             if (err) {
                 return resp.json({
@@ -161,7 +161,7 @@ export class RoleClientClass {
                 });
             }
 
-            if (!roleDB || roleDB.length === 0) {
+            if (!rolesDB || rolesDB.length === 0) {
                 return resp.json({
                     ok: false,
                     mensaje: `No existen el role en la base de datos`
@@ -170,7 +170,7 @@ export class RoleClientClass {
 
             return resp.json({
                 ok: true,
-                roleDB
+                rolesDB
             });
         });
     }
