@@ -80,14 +80,16 @@ export class Product {
     editarProducto(req: any, res: Response): void {
 
         const id = req.get('id') || '';
-        const estadoHeader: string = req.get('estado');
-        const estado: boolean = castEstado(estadoHeader);
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
+        const estado = req.body.estado;
 
         const query = {
             nombre: req.body.nombre,
             precio: req.body.precio,
             descripcion: req.body.descripcion,
             sucursal: req.body.sucursal,
+            categoria: req.body.categoria,
             ayuda: req.body.ayuda,
             estado: estado
         }
@@ -109,19 +111,22 @@ export class Product {
                 });
             }
 
-            if (query.nombre) {
+            if (!query.nombre) {
                 query.nombre = productoDB.nombre;
             }
-            if (query.precio) {
+            if (!query.precio) {
                 query.precio = productoDB.precio;
             }
-            if (query.descripcion) {
+            if (!query.descripcion) {
                 query.descripcion = productoDB.descripcion;
             }
-            if (query.sucursal) {
+            if (!query.sucursal) {
                 query.sucursal = productoDB.sucursal;
             }
-            if (query.estado) {
+            if (!query.categoria) {
+                query.categoria = productoDB.categoria;
+            }
+            if (!query.estado) {
                 query.estado = productoDB.estado;
             }
             if (!query.estado) {
@@ -160,7 +165,10 @@ export class Product {
 
         const id = req.get('id') || '';
 
-        productModel.findById(id, (err: CallbackError, productoDB: Document) => {
+        productModel.findById(id)
+        .populate('sucursal')
+        .populate('categoria')
+        .exec((err: any, productoDB: any) => {
 
             if (err) {
                 return res.json({
@@ -245,6 +253,40 @@ export class Product {
             return res.json({
                 ok: true,
                 productoDB
+            });
+
+        });
+    }
+
+    // Obtener productos
+    obtenerProductos(req: any, res: Response): void {
+
+        productModel.find({})
+        .populate('sucursal')
+        .populate('categoria')
+        .exec((err: any, productosDB: Array<any>) => { // estado: estado 
+
+            if (err) {
+                return res.json({
+                    ok: false,
+                    mensaje: `Error interno`,
+                    err
+                });
+
+            }
+
+            // if (!productosDB || productosDB.length === 0) {
+
+            //     return res.json({
+            //         ok: false,
+            //         mensaje: `No existen productos con ese criterio de búsqueda`,
+            //         productosDB
+            //     })
+            // }
+
+            return res.json({
+                ok: true,
+                productosDB
             });
 
         });

@@ -24,7 +24,7 @@ export class MetodoPagoClass {
 
         });
 
-        nuevoMetodoPago.save((err: CallbackError, metodoPagoDB: MetodoPagoInterface) => {
+        nuevoMetodoPago.save((err: CallbackError, metodoDB: MetodoPagoInterface) => {
 
             if (err) {
                 return resp.json({
@@ -37,7 +37,7 @@ export class MetodoPagoClass {
             return resp.json({
                 ok: true,
                 mensaje: `Método de pago ${req.body.nombre} creado`,
-                metodoPagoDB
+                metodoDB
             });
         });
     }
@@ -47,11 +47,10 @@ export class MetodoPagoClass {
         const id = req.get('id');
 
         const nombreBody: string = req.body.nombre;
-        const estadBody: string = req.body.estado;
+        // const estadBody: string = req.body.estado;
+        // const estado: boolean = castEstado(estadoHeader);
         const nivelBody: number = Number(req.body.nivel);
-
-        const estadoHeader: string = req.get('estado');
-        const estado: boolean = castEstado(estadoHeader);
+        const estado = req.body.estado;
 
         const query = {
             nombre: nombreBody,
@@ -59,7 +58,7 @@ export class MetodoPagoClass {
             nivel: nivelBody
         }
 
-        metodoPagoModel.findById(id, (err: CallbackError, metodoActualizadoDB: MetodoPagoInterface) => {
+        metodoPagoModel.findById(id, (err: CallbackError, metodoDB: MetodoPagoInterface) => {
 
 
             if (err) {
@@ -70,26 +69,22 @@ export class MetodoPagoClass {
                 });
             }
 
-            if (!metodoActualizadoDB) {
+            if (!metodoDB) {
                 return resp.json({
                     ok: false,
                     mensaje: `No se encontró un método de pago con ese ID`,
                 });
             }
 
-            if (query.nombre) {
-                query.nombre = metodoActualizadoDB.nombre;
+            if (!query.nombre) {
+                query.nombre = metodoDB.nombre;
             }
 
-            if (query.estado) {
-                query.estado = metodoActualizadoDB.estado;
+            if (!query.nivel) {
+                query.nivel = metodoDB.nivel;
             }
 
-            if (query.nivel) {
-                query.nivel = metodoActualizadoDB.nivel;
-            }
-
-            metodoPagoModel.findByIdAndUpdate(id, query, { new: true }, (err: CallbackError, metodoActualizadoDB: any) => {
+            metodoPagoModel.findByIdAndUpdate(id, query, { new: true }, (err: CallbackError, metodoDB: any) => {
 
                 if (err) {
                     return resp.json({
@@ -102,7 +97,8 @@ export class MetodoPagoClass {
 
                 return resp.json({
                     ok: true,
-                    metodoActualizadoDB
+                    mensaje: 'Método actuaizado',
+                    metodoDB
                 });
             });
         });
@@ -142,7 +138,7 @@ export class MetodoPagoClass {
         const estadoHeader: string = req.get('estado');
         const estado: boolean = castEstado(estadoHeader);
 
-        metodoPagoModel.find({ estado: estado }, (err: CallbackError, metodosDB: Array<MetodoPagoInterface>) => {
+        metodoPagoModel.find({ }, (err: CallbackError, metodosDB: Array<MetodoPagoInterface>) => { // estado: estado
 
             if (err) {
                 return resp.json({
@@ -183,6 +179,7 @@ export class MetodoPagoClass {
 
             return resp.json({
                 ok: true,
+                mensaje: 'Método eliminado',
                 metodoDB
             });
         });

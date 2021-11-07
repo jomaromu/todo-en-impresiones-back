@@ -28,6 +28,7 @@ class CategoriaClass {
             else {
                 return resp.json({
                     ok: true,
+                    mensaje: 'Categoría creada',
                     categoriaDB
                 });
             }
@@ -36,11 +37,13 @@ class CategoriaClass {
     editarCategoriaID(req, resp) {
         const id = req.get('id');
         const nombre = req.body.nombre;
-        const estadoHeader = req.get('estado');
-        const estado = (0, castEstado_1.castEstado)(estadoHeader);
+        // const estadoHeader: string = req.get('estado');
+        const estadoBody = req.body.estado;
+        // const estado: boolean = castEstado(estadoBody);
+        // console.log(estadoBody)
         const query = {
             nombre: nombre,
-            estado: estado
+            estado: estadoBody
         };
         categoriaModel_1.default.findById(id, (err, categoriaDB) => {
             if (err) {
@@ -78,6 +81,7 @@ class CategoriaClass {
                 }
                 return resp.json({
                     ok: true,
+                    mensaje: 'Categoría actualizada',
                     categoriaDB
                 });
             });
@@ -86,7 +90,7 @@ class CategoriaClass {
     obtenerTodasCategorias(req, resp) {
         const estadoHeader = req.get('estado');
         const estado = (0, castEstado_1.castEstado)(estadoHeader);
-        categoriaModel_1.default.find({ estado: estado }, (err, categoriaDB) => {
+        categoriaModel_1.default.find({}, (err, categoriasDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
@@ -94,7 +98,7 @@ class CategoriaClass {
                     err
                 });
             }
-            if (categoriaDB.length === 0) {
+            if (categoriasDB.length === 0) {
                 return resp.json({
                     ok: false,
                     mensaje: `No se encontraron categorías`
@@ -102,7 +106,7 @@ class CategoriaClass {
             }
             return resp.json({
                 ok: true,
-                categoriaDB
+                categoriasDB
             });
         });
     }
@@ -146,6 +150,7 @@ class CategoriaClass {
             }
             return resp.json({
                 ok: true,
+                mensaje: 'Categoría eliminada',
                 categoriaDB
             });
         });

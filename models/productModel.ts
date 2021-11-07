@@ -16,7 +16,7 @@ const productSchema = new Schema({
     descripcion: { type: String },
     seguimiento_disenio: { type: String },
     seguimiento_produccion: { type: String },
-    sucursal: { type: String },
+    sucursal: { type: mongoose.Types.ObjectId, ref: 'sucursales' },
     fecha_alta: { type: String },
     categoria: { type: mongoose.Types.ObjectId, ref: 'categoria', required: [true, 'Categoría es necesaria'] },
     estado: { type: Boolean, default: true },

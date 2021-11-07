@@ -45,8 +45,9 @@ class OrigenPedido {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.get('id');
             const nombre = req.body.nombre;
-            const estadoHeader = req.get('estado');
-            const estado = (0, castEstado_1.castEstado)(estadoHeader);
+            const estado = req.body.estado;
+            // const estado = req.get('estado');
+            // const estado: boolean = castEstado(estadoHeader);
             const respOrigen = yield origenPedidoModel_1.default.findById(id).exec();
             if (!respOrigen) {
                 return resp.json({
@@ -62,10 +63,8 @@ class OrigenPedido {
                 if (!query.nombre) {
                     query.nombre = respOrigen.nombre;
                 }
-                if (!query.estado) {
-                    query.estado = respOrigen.estado;
-                }
-                origenPedidoModel_1.default.findByIdAndUpdate(id, query, { new: true }, (err, origenActualizadoDB) => {
+                // console.log(query.estado)
+                origenPedidoModel_1.default.findByIdAndUpdate(id, query, { new: true }, (err, origenDB) => {
                     if (err) {
                         return resp.json({
                             ok: false,
@@ -75,7 +74,8 @@ class OrigenPedido {
                     }
                     return resp.json({
                         ok: true,
-                        origenActualizadoDB
+                        mensaje: 'Origen actualizado',
+                        origenDB
                     });
                 });
             }
@@ -106,7 +106,7 @@ class OrigenPedido {
     obtenerOrigenes(req, resp) {
         const estadoHeader = req.get('estado');
         const estado = (0, castEstado_1.castEstado)(estadoHeader);
-        origenPedidoModel_1.default.find({ estado: estado }, (err, origenesDB) => {
+        origenPedidoModel_1.default.find({}, (err, origenesDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
@@ -114,12 +114,12 @@ class OrigenPedido {
                     err
                 });
             }
-            if (origenesDB.length === 0) {
-                return resp.json({
-                    ok: false,
-                    mensaje: `No se encontró un Origen de Pedido`
-                });
-            }
+            // if (origenesDB.length === 0) {
+            //     return resp.json({
+            //         ok: false,
+            //         mensaje: `No se encontró un Origen de Pedido`
+            //     });
+            // }
             return resp.json({
                 ok: true,
                 origenesDB

@@ -36,6 +36,7 @@ export class AyudaClass {
 
                 return resp.json({
                     ok: true,
+                    mensaje: `Ayuda creada`,
                     ayudaDB
                 });
             }
@@ -47,6 +48,7 @@ export class AyudaClass {
     async editarAyuda(req: any, resp: Response): Promise<any> {
 
         const id = req.get('id');
+        const estado = req.body.estado;
 
         ayudaModel.findById(id, (err: CallbackError, ayudaDB: AyudaModelInterface) => {
 
@@ -68,7 +70,8 @@ export class AyudaClass {
             const query = {
 
                 nombre: req.body.nombre,
-                descripcion: req.body.descripcion
+                descripcion: req.body.descripcion,
+                estado: estado
             }
 
             if (!query.nombre) {
@@ -79,7 +82,7 @@ export class AyudaClass {
                 query.descripcion = ayudaDB.descripcion;
             }
 
-            ayudaModel.findByIdAndUpdate(id, query, { new: true }, (err: any, ayudaActualizadaDB: any) => {
+            ayudaModel.findByIdAndUpdate(id, query, { new: true }, (err: any, ayudaDB: any) => {
 
                 if (err) {
                     return resp.json({
@@ -91,7 +94,8 @@ export class AyudaClass {
 
                 return resp.json({
                     ok: true,
-                    ayudaActualizadaDB
+                    mensaje: `Ayuda actualizada`,
+                    ayudaDB
                 });
             });
 
@@ -102,9 +106,9 @@ export class AyudaClass {
 
         const id = req.get('id');
 
-        const respAyuda = await ayudaModel.findById(id);
+        const ayudaDB = await ayudaModel.findById(id);
 
-        if (!respAyuda) {
+        if (!ayudaDB) {
 
             return resp.json({
                 ok: false,
@@ -115,16 +119,16 @@ export class AyudaClass {
 
             return resp.json({
                 ok: true,
-                respAyuda
+                ayudaDB
             });
         }
     }
 
     async obtenerTodas(req: any, resp: Response): Promise<any> {
 
-        const respAyuda = await ayudaModel.find({});
+        const ayudasDB = await ayudaModel.find({});
 
-        if (!respAyuda) {
+        if (!ayudasDB) {
 
             return resp.json({
                 ok: false,
@@ -135,7 +139,7 @@ export class AyudaClass {
 
             resp.json({
                 ok: true,
-                respAyuda
+                ayudasDB
             });
         }
     }
@@ -144,9 +148,9 @@ export class AyudaClass {
 
         const id = req.get('id');
 
-        const respAyuda = await ayudaModel.findByIdAndDelete(id);
+        const ayudaDB = await ayudaModel.findByIdAndDelete(id);
 
-        if (!respAyuda) {
+        if (!ayudaDB) {
 
             return resp.json({
                 ok: false,
@@ -157,7 +161,8 @@ export class AyudaClass {
 
             return resp.json({
                 ok: true,
-                respAyuda
+                mensaje: `Ayuda eliminada`,
+                ayudaDB
             });
         }
     }

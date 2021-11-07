@@ -204,9 +204,9 @@ class ClientClass {
         const telefono = req.get('telefono');
         const estadoHeader = req.get('estado');
         const estado = (0, castEstado_1.castEstado)(estadoHeader);
-        clientModel_1.default.find({ $and: [{ telefono: { $regex: telefono, $options: 'i' } }, { estado: estado }] })
+        clientModel_1.default.find({ $and: [{ telefono: { $regex: telefono, $options: 'i' } }] }) // , { estado: estado }
             .populate('sucursal')
-            .exec((err, usuarioDB) => {
+            .exec((err, usuariosDB) => {
             if (err) {
                 return res.json({
                     ok: false,
@@ -214,15 +214,15 @@ class ClientClass {
                     err
                 });
             }
-            if (!usuarioDB) {
-                return res.json({
-                    ok: false,
-                    mensaje: `No existe el Usuario en la base de datos`
-                });
-            }
+            // if (!usuariosDB) {
+            //     return res.json({
+            //         ok: false,
+            //         mensaje: `No existe el Usuario en la base de datos`
+            //     });
+            // }
             return res.json({
                 ok: true,
-                usuarioDB
+                usuariosDB
             });
         });
     }
@@ -256,11 +256,12 @@ class ClientClass {
     }
     // Obtener usuarios por criterio nombre
     obtenerUsuarioCriterioNombre(req, res) {
-        const criterioNombre = req.body.criterioNombre;
+        // const criterioNombre = req.body.criterioNombre;
+        const criterioNombre = req.get('criterioNombre');
         const estadoHeader = req.get('estado');
         const estado = (0, castEstado_1.castEstado)(estadoHeader);
         // /^[a-zA-ZáéíóúÁÉÍÓU]+$/
-        clientModel_1.default.find({ $and: [{ nombre: { $regex: criterioNombre, $options: 'i' } }, { estado: estado }] })
+        clientModel_1.default.find({ $and: [{ nombre: { $regex: criterioNombre, $options: 'i' } }] }) // , { estado: estado }
             .populate('sucursal')
             .exec((err, usuariosDB) => {
             if (err) {
@@ -270,13 +271,13 @@ class ClientClass {
                     err
                 });
             }
-            if (!usuariosDB || usuariosDB.length === 0) {
-                return res.json({
-                    ok: false,
-                    mensaje: `No existen usuarios con ese criterio de búsqueda`,
-                    usuariosDB
-                });
-            }
+            // if (!usuariosDB || usuariosDB.length === 0) {
+            //     return res.json({
+            //         ok: false,
+            //         mensaje: `No existen usuarios con ese criterio de búsqueda`,
+            //         usuariosDB
+            //     })
+            // }
             return res.json({
                 ok: true,
                 usuariosDB

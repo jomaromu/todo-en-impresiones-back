@@ -42,4 +42,10 @@ pedidoRouter.get('/redireccionBandejas', [verificaToken], (req: Request, resp: R
     redireccionBandejas.redireccionBandejas(req, resp);
 });
 
+pedidoRouter.get('/busquedaBandeja', [verificaToken], (req: Request, resp: Response) => {
+
+    const busquedaBandeja = new PedidosClass();
+    busquedaBandeja.busquedaBandeja(req, resp);
+});
+
 export default pedidoRouter;

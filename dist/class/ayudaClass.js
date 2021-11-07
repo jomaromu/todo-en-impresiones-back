@@ -37,6 +37,7 @@ class AyudaClass {
             else {
                 return resp.json({
                     ok: true,
+                    mensaje: `Ayuda creada`,
                     ayudaDB
                 });
             }
@@ -45,6 +46,7 @@ class AyudaClass {
     editarAyuda(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.get('id');
+            const estado = req.body.estado;
             ayudaModel_1.default.findById(id, (err, ayudaDB) => {
                 if (err) {
                     return resp.json({
@@ -61,7 +63,8 @@ class AyudaClass {
                 }
                 const query = {
                     nombre: req.body.nombre,
-                    descripcion: req.body.descripcion
+                    descripcion: req.body.descripcion,
+                    estado: estado
                 };
                 if (!query.nombre) {
                     query.nombre = ayudaDB.nombre;
@@ -69,7 +72,7 @@ class AyudaClass {
                 if (!query.descripcion) {
                     query.descripcion = ayudaDB.descripcion;
                 }
-                ayudaModel_1.default.findByIdAndUpdate(id, query, { new: true }, (err, ayudaActualizadaDB) => {
+                ayudaModel_1.default.findByIdAndUpdate(id, query, { new: true }, (err, ayudaDB) => {
                     if (err) {
                         return resp.json({
                             ok: false,
@@ -79,7 +82,8 @@ class AyudaClass {
                     }
                     return resp.json({
                         ok: true,
-                        ayudaActualizadaDB
+                        mensaje: `Ayuda actualizada`,
+                        ayudaDB
                     });
                 });
             });
@@ -88,8 +92,8 @@ class AyudaClass {
     obtenerAyudaID(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.get('id');
-            const respAyuda = yield ayudaModel_1.default.findById(id);
-            if (!respAyuda) {
+            const ayudaDB = yield ayudaModel_1.default.findById(id);
+            if (!ayudaDB) {
                 return resp.json({
                     ok: false,
                     mensaje: `No se encontró una ayuda o un error ha ocurrido`
@@ -98,15 +102,15 @@ class AyudaClass {
             else {
                 return resp.json({
                     ok: true,
-                    respAyuda
+                    ayudaDB
                 });
             }
         });
     }
     obtenerTodas(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {
-            const respAyuda = yield ayudaModel_1.default.find({});
-            if (!respAyuda) {
+            const ayudasDB = yield ayudaModel_1.default.find({});
+            if (!ayudasDB) {
                 return resp.json({
                     ok: false,
                     mensaje: `Error interno o no se encontraron ayuda(s)`
@@ -115,7 +119,7 @@ class AyudaClass {
             else {
                 resp.json({
                     ok: true,
-                    respAyuda
+                    ayudasDB
                 });
             }
         });
@@ -123,8 +127,8 @@ class AyudaClass {
     eliminarAyuda(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.get('id');
-            const respAyuda = yield ayudaModel_1.default.findByIdAndDelete(id);
-            if (!respAyuda) {
+            const ayudaDB = yield ayudaModel_1.default.findByIdAndDelete(id);
+            if (!ayudaDB) {
                 return resp.json({
                     ok: false,
                     mensaje: `No se encontró una ayuda o un error ha ocurrido`
@@ -133,7 +137,8 @@ class AyudaClass {
             else {
                 return resp.json({
                     ok: true,
-                    respAyuda
+                    mensaje: `Ayuda eliminada`,
+                    ayudaDB
                 });
             }
         });

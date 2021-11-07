@@ -60,13 +60,15 @@ class Product {
     // Editar un producto
     editarProducto(req, res) {
         const id = req.get('id') || '';
-        const estadoHeader = req.get('estado');
-        const estado = (0, castEstado_1.castEstado)(estadoHeader);
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
+        const estado = req.body.estado;
         const query = {
             nombre: req.body.nombre,
             precio: req.body.precio,
             descripcion: req.body.descripcion,
             sucursal: req.body.sucursal,
+            categoria: req.body.categoria,
             ayuda: req.body.ayuda,
             estado: estado
         };
@@ -84,19 +86,22 @@ class Product {
                     mensaje: `No se encontró un producto con ese ID en la base de datos`
                 });
             }
-            if (query.nombre) {
+            if (!query.nombre) {
                 query.nombre = productoDB.nombre;
             }
-            if (query.precio) {
+            if (!query.precio) {
                 query.precio = productoDB.precio;
             }
-            if (query.descripcion) {
+            if (!query.descripcion) {
                 query.descripcion = productoDB.descripcion;
             }
-            if (query.sucursal) {
+            if (!query.sucursal) {
                 query.sucursal = productoDB.sucursal;
             }
-            if (query.estado) {
+            if (!query.categoria) {
+                query.categoria = productoDB.categoria;
+            }
+            if (!query.estado) {
                 query.estado = productoDB.estado;
             }
             if (!query.estado) {
@@ -127,7 +132,10 @@ class Product {
     // Obtener producto por ID
     obtenerProductoID(req, res) {
         const id = req.get('id') || '';
-        productModel_1.default.findById(id, (err, productoDB) => {
+        productModel_1.default.findById(id)
+            .populate('sucursal')
+            .populate('categoria')
+            .exec((err, productoDB) => {
             if (err) {
                 return res.json({
                     ok: false,
@@ -194,6 +202,32 @@ class Product {
             return res.json({
                 ok: true,
                 productoDB
+            });
+        });
+    }
+    // Obtener productos
+    obtenerProductos(req, res) {
+        productModel_1.default.find({})
+            .populate('sucursal')
+            .populate('categoria')
+            .exec((err, productosDB) => {
+            if (err) {
+                return res.json({
+                    ok: false,
+                    mensaje: `Error interno`,
+                    err
+                });
+            }
+            // if (!productosDB || productosDB.length === 0) {
+            //     return res.json({
+            //         ok: false,
+            //         mensaje: `No existen productos con ese criterio de búsqueda`,
+            //         productosDB
+            //     })
+            // }
+            return res.json({
+                ok: true,
+                productosDB
             });
         });
     }

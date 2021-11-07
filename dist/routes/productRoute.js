@@ -41,6 +41,13 @@ productRouter.get('/obtenerProductoCriterioNombre', [auth_1.verificaToken], (req
     obtenerProductoCriterioNombre.obtenerProductoCriterioNombre(req, resp);
 });
 // ==================================================================== //
+// Obtener todos los productos
+// ==================================================================== //
+productRouter.get('/obtenerProductos', [auth_1.verificaToken], (req, resp) => {
+    const obtenerProductos = new productClass_1.Product();
+    obtenerProductos.obtenerProductos(req, resp);
+});
+// ==================================================================== //
 // Obtener un productos por sucursal
 // ==================================================================== //
 productRouter.get('/obtenerProductosSucursal', [auth_1.verificaToken], (req, resp) => {

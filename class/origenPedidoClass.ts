@@ -46,9 +46,10 @@ export class OrigenPedido {
 
         const id = req.get('id');
         const nombre = req.body.nombre;
+        const estado = req.body.estado;
 
-        const estadoHeader: string = req.get('estado');
-        const estado: boolean = castEstado(estadoHeader);
+        // const estado = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
 
         const respOrigen = await origenPedidoModel.findById(id).exec();
 
@@ -70,11 +71,9 @@ export class OrigenPedido {
                 query.nombre = respOrigen.nombre;
             }
 
-            if (!query.estado) {
-                query.estado = respOrigen.estado;
-            }
+            // console.log(query.estado)
 
-            origenPedidoModel.findByIdAndUpdate(id, query, { new: true }, (err: CallbackError, origenActualizadoDB: any) => {
+            origenPedidoModel.findByIdAndUpdate(id, query, { new: true }, (err: CallbackError, origenDB: any) => {
 
                 if (err) {
                     return resp.json({
@@ -86,7 +85,8 @@ export class OrigenPedido {
 
                 return resp.json({
                     ok: true,
-                    origenActualizadoDB
+                    mensaje: 'Origen actualizado',
+                    origenDB
                 });
             });
         }
@@ -127,7 +127,7 @@ export class OrigenPedido {
         const estadoHeader: string = req.get('estado');
         const estado: boolean = castEstado(estadoHeader);
 
-        origenPedidoModel.find({ estado: estado }, (err: CallbackError, origenesDB: Array<OrigenPedidoInterface>) => {
+        origenPedidoModel.find({ }, (err: CallbackError, origenesDB: Array<OrigenPedidoInterface>) => { // estado: estado
 
             if (err) {
 
@@ -138,12 +138,12 @@ export class OrigenPedido {
                 });
             }
 
-            if (origenesDB.length === 0) {
-                return resp.json({
-                    ok: false,
-                    mensaje: `No se encontró un Origen de Pedido`
-                });
-            }
+            // if (origenesDB.length === 0) {
+            //     return resp.json({
+            //         ok: false,
+            //         mensaje: `No se encontró un Origen de Pedido`
+            //     });
+            // }
 
             return resp.json({
                 ok: true,

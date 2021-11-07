@@ -34,10 +34,11 @@ class PedidosClass {
         const idReferencia = this.idRef;
         const fecha_alta = (0, moment_1.default)().format('YYYY-MM-DD');
         // const fecha_alta = moment().format('2021-04-15');
-        const fecha_entrega = (0, moment_1.default)().add(3, 'days').format('YYYY-MM-DD');
+        // const fecha_entrega = moment().add(3, 'days').format('YYYY-MM-DD');
+        const fecha_entrega = req.body.fecha_entrega;
         const cliente = req.get('cliente');
         const sucursal = req.get('sucursal');
-        const origenPedido = req.get('origen');
+        // const origenPedido = req.get('origen');
         const crearNuevoPedido = new pedidoModel_1.default({
             idCreador: idCreador,
             idReferencia: idReferencia,
@@ -45,7 +46,7 @@ class PedidosClass {
             fecha_entrega: fecha_entrega,
             cliente: cliente,
             sucursal: sucursal,
-            origen_pedido: origenPedido
+            // origen_pedido: origenPedido
         });
         crearNuevoPedido.save((err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
             if (err) {
@@ -178,9 +179,9 @@ class PedidosClass {
         pedidoModel_1.default.findById(id)
             .populate('idCreador', 'nombre apellido colaborador_role')
             .populate({ path: 'archivos', populate: { path: 'idCreador', select: 'nombre' } })
-            .populate('etapa_pedido', 'nombre')
-            .populate('prioridad_pedido', 'nombre color_prioridad')
-            .populate({ path: 'productos_pedidos', populate: { path: 'producto' } })
+            // .populate('etapa_pedido', 'nombre')
+            // .populate('prioridad_pedido', 'nombre color_prioridad')
+            // .populate({ path: 'productos_pedidos', populate: { path: 'producto' } })
             .populate({ path: 'productos_pedidos', populate: { path: 'producto' } })
             .populate('pagos_pedido')
             .populate('cliente')
@@ -231,9 +232,9 @@ class PedidosClass {
     }
     obtenerTodos(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {
-            const estadoHeader = req.get('estado');
-            const estado = (0, castEstado_1.castEstado)(estadoHeader);
-            const fecha_actual = (0, moment_1.default)().format('YYYY-MM-DD');
+            // const estadoHeader: string = req.get('estado');
+            // const estado: boolean = castEstado(estadoHeader);
+            // const fecha_actual: string = moment().format('YYYY-MM-DD');
             const respPedido = yield pedidoModel_1.default.aggregate([
                 {
                     $lookup: {
@@ -315,9 +316,9 @@ class PedidosClass {
                         as: 'Sucursal'
                     }
                 },
-                {
-                    $match: { estado: estado }
-                },
+                // {
+                //     $match: { estado: true } // estado: estado
+                // },
                 {
                     $sort: { 'PrioridadPedido.importancia': 1, fecha_actual: 1 }
                 },
@@ -334,7 +335,7 @@ class PedidosClass {
             else {
                 return resp.json({
                     ok: true,
-                    pedidoDB: respPedido,
+                    pedidosDB: respPedido,
                     cantidad: respPedido.length
                 });
             }
@@ -824,6 +825,152 @@ class PedidosClass {
                 this.obtenerTodos(req, resp);
                 break;
         }
+    }
+    busquedaBandeja(req, resp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // const estadoHeader: string = req.get('estado');
+            // const estado: boolean = castEstado(estadoHeader);
+            const role = req.get('colRole');
+            const userID = req.get('userID');
+            const sucursal = req.get('sucursal');
+            const match = {
+                $match: {}
+            };
+            if (role === 'null' && userID === 'null' && sucursal === 'null') {
+                match.$match;
+            }
+            else if (sucursal === 'null') {
+                if (role === 'DiseniadorRole') {
+                    // buscar por AsignadoA
+                    match.$match = { 'AsignadoA._id': new mongoose.Types.ObjectId(userID) };
+                }
+                else {
+                    match.$match = { 'Worker.colaborador_role': role, 'Worker._id': new mongoose.Types.ObjectId(userID) };
+                }
+            }
+            else if (role === 'null' && userID === 'null') {
+                match.$match = { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal), };
+            }
+            else {
+                if (role === 'DiseniadorRole') {
+                    // buscar por AsignadoA
+                    match.$match = { 'AsignadoA._id': new mongoose.Types.ObjectId(userID), 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) };
+                }
+                else {
+                    match.$match = { 'Worker.colaborador_role': role, 'Sucursal._id': new mongoose.Types.ObjectId(sucursal), 'Worker._id': new mongoose.Types.ObjectId(userID) };
+                }
+            }
+            const pedidosDB = yield pedidoModel_1.default.aggregate([
+                {
+                    $lookup: {
+                        from: 'prioridadpedidos',
+                        localField: 'prioridad_pedido',
+                        foreignField: '_id',
+                        as: 'PrioridadPedido'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'archivos',
+                        localField: 'archivos',
+                        foreignField: '_id',
+                        as: 'Archivos'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'productopedidos',
+                        localField: 'productos_pedidos',
+                        foreignField: '_id',
+                        as: 'ProductosPedidos'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'pagos',
+                        localField: 'pagos_pedido',
+                        foreignField: '_id',
+                        as: 'PagosPedido'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'userworkers',
+                        localField: 'idCreador',
+                        foreignField: '_id',
+                        as: 'IDCreador'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'userclients',
+                        localField: 'cliente',
+                        foreignField: '_id',
+                        as: 'Cliente'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'userworkers',
+                        localField: 'asignado_a',
+                        foreignField: '_id',
+                        as: 'AsignadoA'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'etapapedidos',
+                        localField: 'etapa_pedido',
+                        foreignField: '_id',
+                        as: 'EtapaPedido'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'prioridadpedidos',
+                        localField: 'prioridad_pedido',
+                        foreignField: '_id',
+                        as: 'PrioridadPedido'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'sucursales',
+                        localField: 'sucursal',
+                        foreignField: '_id',
+                        as: 'Sucursal'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'userworkers',
+                        localField: 'idCreador',
+                        foreignField: '_id',
+                        as: 'Worker'
+                    }
+                },
+                {
+                    $sort: { 'PrioridadPedido.importancia': 1, fecha_actual: 1 }
+                },
+                match,
+                {
+                    $unset: ['AsignadoA.password', 'IDCreador.password']
+                }
+            ]);
+            if (!pedidosDB || pedidosDB.length === 0) {
+                return resp.json({
+                    ok: false,
+                    mensaje: `No se encontraron pedidos`
+                });
+            }
+            else {
+                return resp.json({
+                    ok: true,
+                    pedidosDB: pedidosDB,
+                    cantidad: pedidosDB.length
+                });
+            }
+        });
     }
 }
 exports.PedidosClass = PedidosClass;

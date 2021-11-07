@@ -35,10 +35,11 @@ export class PedidosClass {
         const idReferencia = this.idRef;
         const fecha_alta = moment().format('YYYY-MM-DD');
         // const fecha_alta = moment().format('2021-04-15');
-        const fecha_entrega = moment().add(3, 'days').format('YYYY-MM-DD');
+        // const fecha_entrega = moment().add(3, 'days').format('YYYY-MM-DD');
+        const fecha_entrega = req.body.fecha_entrega;
         const cliente = req.get('cliente');
         const sucursal = req.get('sucursal');
-        const origenPedido = req.get('origen');
+        // const origenPedido = req.get('origen');
 
         const crearNuevoPedido = new pedidoModel({
 
@@ -48,7 +49,7 @@ export class PedidosClass {
             fecha_entrega: fecha_entrega,
             cliente: cliente,
             sucursal: sucursal,
-            origen_pedido: origenPedido
+            // origen_pedido: origenPedido
 
         });
 
@@ -215,13 +216,14 @@ export class PedidosClass {
 
     obtenerPedidoID(req: any, resp: Response): void {
         const id = req.get('id');
+        
 
         pedidoModel.findById(id)
             .populate('idCreador', 'nombre apellido colaborador_role')
             .populate({ path: 'archivos', populate: { path: 'idCreador', select: 'nombre' } })
-            .populate('etapa_pedido', 'nombre')
-            .populate('prioridad_pedido', 'nombre color_prioridad')
-            .populate({ path: 'productos_pedidos', populate: { path: 'producto' } })
+            // .populate('etapa_pedido', 'nombre')
+            // .populate('prioridad_pedido', 'nombre color_prioridad')
+            // .populate({ path: 'productos_pedidos', populate: { path: 'producto' } })
             .populate({ path: 'productos_pedidos', populate: { path: 'producto' } })
             .populate('pagos_pedido')
             .populate('cliente')
@@ -285,10 +287,10 @@ export class PedidosClass {
 
     async obtenerTodos(req: any, resp: Response): Promise<any> {
 
-        const estadoHeader: string = req.get('estado');
-        const estado: boolean = castEstado(estadoHeader);
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
 
-        const fecha_actual: string = moment().format('YYYY-MM-DD');
+        // const fecha_actual: string = moment().format('YYYY-MM-DD');
         const respPedido = await pedidoModel.aggregate([
             {
                 $lookup: {
@@ -370,9 +372,9 @@ export class PedidosClass {
                     as: 'Sucursal'
                 }
             },
-            {
-                $match: { estado: estado }
-            },
+            // {
+            //     $match: { estado: true } // estado: estado
+            // },
             {
                 $sort: { 'PrioridadPedido.importancia': 1, fecha_actual: 1 }
             },
@@ -392,7 +394,7 @@ export class PedidosClass {
 
             return resp.json({
                 ok: true,
-                pedidoDB: respPedido,
+                pedidosDB: respPedido,
                 cantidad: respPedido.length
             });
 
@@ -912,6 +914,172 @@ export class PedidosClass {
             case 'SuperRole':
                 this.obtenerTodos(req, resp);
                 break;
+        }
+
+    }
+
+    async busquedaBandeja(req: any, resp: Response): Promise<any> {
+
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
+
+        const role = req.get('colRole');
+        const userID = req.get('userID');
+        const sucursal = req.get('sucursal');
+        const match: any = {
+            $match: {}
+        };
+
+        if (role === 'null' && userID === 'null' && sucursal === 'null') {
+
+            match.$match;
+
+        } else if (sucursal === 'null') {
+
+            if (role === 'DiseniadorRole') {
+
+                // buscar por AsignadoA
+                match.$match = { 'AsignadoA._id': new mongoose.Types.ObjectId(userID) }
+
+            } else {
+
+                match.$match = { 'Worker.colaborador_role': role, 'Worker._id': new mongoose.Types.ObjectId(userID) }
+
+            }
+
+        } else if (role === 'null' && userID === 'null') {
+
+            match.$match = { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal), }
+
+
+        } else {
+
+            if (role === 'DiseniadorRole') {
+
+                // buscar por AsignadoA
+                match.$match = { 'AsignadoA._id': new mongoose.Types.ObjectId(userID), 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }
+
+            } else {
+
+                match.$match = { 'Worker.colaborador_role': role, 'Sucursal._id': new mongoose.Types.ObjectId(sucursal), 'Worker._id': new mongoose.Types.ObjectId(userID) }
+            }
+
+        }
+
+
+
+        const pedidosDB = await pedidoModel.aggregate([
+            {
+                $lookup: {
+                    from: 'prioridadpedidos',
+                    localField: 'prioridad_pedido',
+                    foreignField: '_id',
+                    as: 'PrioridadPedido'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'archivos',
+                    localField: 'archivos',
+                    foreignField: '_id',
+                    as: 'Archivos'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'productopedidos',
+                    localField: 'productos_pedidos',
+                    foreignField: '_id',
+                    as: 'ProductosPedidos'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'pagos',
+                    localField: 'pagos_pedido',
+                    foreignField: '_id',
+                    as: 'PagosPedido'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'userworkers',
+                    localField: 'idCreador',
+                    foreignField: '_id',
+                    as: 'IDCreador'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'userclients',
+                    localField: 'cliente',
+                    foreignField: '_id',
+                    as: 'Cliente'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'userworkers',
+                    localField: 'asignado_a',
+                    foreignField: '_id',
+                    as: 'AsignadoA'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'etapapedidos',
+                    localField: 'etapa_pedido',
+                    foreignField: '_id',
+                    as: 'EtapaPedido'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'prioridadpedidos',
+                    localField: 'prioridad_pedido',
+                    foreignField: '_id',
+                    as: 'PrioridadPedido'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'sucursales',
+                    localField: 'sucursal',
+                    foreignField: '_id',
+                    as: 'Sucursal'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'userworkers',
+                    localField: 'idCreador',
+                    foreignField: '_id',
+                    as: 'Worker'
+                }
+            },
+
+            {
+                $sort: { 'PrioridadPedido.importancia': 1, fecha_actual: 1 }
+            },
+            match,
+            {
+                $unset: ['AsignadoA.password', 'IDCreador.password']
+            }
+        ]);
+
+        if (!pedidosDB || pedidosDB.length === 0) {
+
+            return resp.json({
+                ok: false,
+                mensaje: `No se encontraron pedidos`
+            });
+
+        } else {
+            return resp.json({
+                ok: true,
+                pedidosDB: pedidosDB,
+                cantidad: pedidosDB.length
+            });
         }
 
     }

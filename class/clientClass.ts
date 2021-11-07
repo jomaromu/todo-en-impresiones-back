@@ -241,9 +241,9 @@ export class ClientClass {
 
         const estado = castEstado(estadoHeader);
 
-        clientModel.find({ $and: [{ telefono: { $regex: telefono, $options: 'i' } }, { estado: estado }] })
+        clientModel.find({ $and: [{ telefono: { $regex: telefono, $options: 'i' } }] }) // , { estado: estado }
             .populate('sucursal')
-            .exec((err: any, usuarioDB: any) => {
+            .exec((err: any, usuariosDB: any) => {
 
                 if (err) {
                     return res.json({
@@ -253,16 +253,16 @@ export class ClientClass {
                     });
                 }
 
-                if (!usuarioDB) {
-                    return res.json({
-                        ok: false,
-                        mensaje: `No existe el Usuario en la base de datos`
-                    });
-                }
+                // if (!usuariosDB) {
+                //     return res.json({
+                //         ok: false,
+                //         mensaje: `No existe el Usuario en la base de datos`
+                //     });
+                // }
 
                 return res.json({
                     ok: true,
-                    usuarioDB
+                    usuariosDB
                 });
             });
     }
@@ -309,13 +309,14 @@ export class ClientClass {
     obtenerUsuarioCriterioNombre(req: any, res: Response): void {
 
 
-        const criterioNombre = req.body.criterioNombre;
+        // const criterioNombre = req.body.criterioNombre;
+        const criterioNombre = req.get('criterioNombre');
         const estadoHeader: string = req.get('estado');
 
         const estado = castEstado(estadoHeader);
         // /^[a-zA-ZáéíóúÁÉÍÓU]+$/
 
-        clientModel.find({ $and: [{ nombre: { $regex: criterioNombre, $options: 'i' } }, { estado: estado }] })
+        clientModel.find({ $and: [{ nombre: { $regex: criterioNombre, $options: 'i' } }] }) // , { estado: estado }
             .populate('sucursal')
             .exec((err: CallbackError, usuariosDB: Array<ClientModelInterface>) => {
 
@@ -328,14 +329,14 @@ export class ClientClass {
 
                 }
 
-                if (!usuariosDB || usuariosDB.length === 0) {
+                // if (!usuariosDB || usuariosDB.length === 0) {
 
-                    return res.json({
-                        ok: false,
-                        mensaje: `No existen usuarios con ese criterio de búsqueda`,
-                        usuariosDB
-                    })
-                }
+                //     return res.json({
+                //         ok: false,
+                //         mensaje: `No existen usuarios con ese criterio de búsqueda`,
+                //         usuariosDB
+                //     })
+                // }
 
                 return res.json({
                     ok: true,
