@@ -446,14 +446,14 @@ export class WorkkerClass {
     // Obtener usuarios por role
     obtenerUsuariosRole(req: any, res: Response): void {
 
-        const estadoHeader: string = req.get('estado');
-        const estado: boolean = castEstado(estadoHeader);
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
 
         const role = req.get('role');
 
         // console.log(req.usuario.role);
 
-        workerModel.find({ $and: [{ colaborador_role: role }, { estado: estado }] }, (err: CallbackError, usuariosDB: Array<WorkerModelInterface>) => {
+        workerModel.find({  colaborador_role: role}, (err: CallbackError, usuariosDB: Array<WorkerModelInterface>) => { // , { estado: estado }]
 
             if (err) {
                 return res.json({

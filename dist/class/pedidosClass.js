@@ -302,14 +302,6 @@ class PedidosClass {
                 },
                 {
                     $lookup: {
-                        from: 'prioridadpedidos',
-                        localField: 'prioridad_pedido',
-                        foreignField: '_id',
-                        as: 'PrioridadPedido'
-                    }
-                },
-                {
-                    $lookup: {
                         from: 'sucursales',
                         localField: 'sucursal',
                         foreignField: '_id',
@@ -320,7 +312,7 @@ class PedidosClass {
                 //     $match: { estado: true } // estado: estado
                 // },
                 {
-                    $sort: { 'PrioridadPedido.importancia': 1, fecha_actual: 1 }
+                    $sort: { prioridad_pedido: 1, fecha_actual: 1 }
                 },
                 {
                     $unset: ['IDCreador.password', 'EtapaPedido.nivel', 'PrioridadPedido.nivel']
@@ -833,32 +825,53 @@ class PedidosClass {
             const role = req.get('colRole');
             const userID = req.get('userID');
             const sucursal = req.get('sucursal');
+            const bandejas = req.get('bandejas');
             const match = {
                 $match: {}
             };
-            if (role === 'null' && userID === 'null' && sucursal === 'null') {
+            if (bandejas === 'null' && userID === 'null' && sucursal === 'null') {
                 match.$match;
             }
-            else if (sucursal === 'null') {
-                if (role === 'DiseniadorRole') {
-                    // buscar por AsignadoA
-                    match.$match = { 'AsignadoA._id': new mongoose.Types.ObjectId(userID) };
-                }
-                else {
-                    match.$match = { 'Worker.colaborador_role': role, 'Worker._id': new mongoose.Types.ObjectId(userID) };
+            if (bandejas !== 'null' && userID === 'null' && sucursal === 'null') {
+                switch (bandejas) {
+                    case 'prod':
+                        match.$match = { $or: [{ 'AsignadoA.colaborador_role': 'ProduccionVIPRole' }, { 'AsignadoA.colaborador_role': 'ProduccionNormalRole' }] };
+                        break;
+                    case 'vend':
+                        match.$match = { $or: [{ 'AsignadoA.colaborador_role': 'VendedorVIPRole' }, { 'AsignadoA.colaborador_role': 'VendedorNormalRole' }] };
+                        break;
+                    case 'dise':
+                        match.$match = { 'AsignadoA.colaborador_role': 'DiseniadorRole' };
+                        break;
+                    case 'admin':
+                        match.$match = { 'AsignadoA.colaborador_role': 'AdminRole' };
+                        break;
                 }
             }
-            else if (role === 'null' && userID === 'null') {
-                match.$match = { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal), };
+            if (bandejas !== 'null' && userID !== 'null' && sucursal === 'null') {
+                match.$match = { $and: [{ 'AsignadoA._id': new mongoose.Types.ObjectId(userID) }, { 'AsignadoA.colaborador_role': role }] };
             }
-            else {
-                if (role === 'DiseniadorRole') {
-                    // buscar por AsignadoA
-                    match.$match = { 'AsignadoA._id': new mongoose.Types.ObjectId(userID), 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) };
+            if (bandejas !== 'null' && userID === 'null' && sucursal !== 'null') {
+                switch (bandejas) {
+                    case 'prod':
+                        match.$match = { $and: [{ $or: [{ 'AsignadoA.colaborador_role': 'ProduccionVIPRole' }, { 'AsignadoA.colaborador_role': 'ProduccionNormalRole' }] }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                        break;
+                    case 'vend':
+                        match.$match = { $and: [{ $or: [{ 'AsignadoA.colaborador_role': 'VendedorVIPRole' }, { 'AsignadoA.colaborador_role': 'VendedorNormalRole' }] }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                        break;
+                    case 'dise':
+                        match.$match = { $and: [{ 'AsignadoA.colaborador_role': 'DiseniadorRole' }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                        break;
+                    case 'admin':
+                        match.$match = { $and: [{ 'AsignadoA.colaborador_role': 'AdminRole' }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                        break;
                 }
-                else {
-                    match.$match = { 'Worker.colaborador_role': role, 'Sucursal._id': new mongoose.Types.ObjectId(sucursal), 'Worker._id': new mongoose.Types.ObjectId(userID) };
-                }
+            }
+            if (sucursal !== 'null' && userID === 'null' && bandejas === 'null') {
+                match.$match = { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) };
+            }
+            if (sucursal !== 'null' && userID !== 'null' && bandejas !== 'null') {
+                match.$match = { $and: [{ 'AsignadoA._id': new mongoose.Types.ObjectId(userID) }, { 'AsignadoA.colaborador_role': role }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
             }
             const pedidosDB = yield pedidoModel_1.default.aggregate([
                 {
@@ -927,14 +940,6 @@ class PedidosClass {
                 },
                 {
                     $lookup: {
-                        from: 'prioridadpedidos',
-                        localField: 'prioridad_pedido',
-                        foreignField: '_id',
-                        as: 'PrioridadPedido'
-                    }
-                },
-                {
-                    $lookup: {
                         from: 'sucursales',
                         localField: 'sucursal',
                         foreignField: '_id',
@@ -950,7 +955,7 @@ class PedidosClass {
                     }
                 },
                 {
-                    $sort: { 'PrioridadPedido.importancia': 1, fecha_actual: 1 }
+                    $sort: { prioridad_pedido: 1, fecha_actual: 1 }
                 },
                 match,
                 {

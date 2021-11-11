@@ -372,11 +372,11 @@ class WorkkerClass {
     }
     // Obtener usuarios por role
     obtenerUsuariosRole(req, res) {
-        const estadoHeader = req.get('estado');
-        const estado = (0, castEstado_1.castEstado)(estadoHeader);
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
         const role = req.get('role');
         // console.log(req.usuario.role);
-        workerModel_1.default.find({ $and: [{ colaborador_role: role }, { estado: estado }] }, (err, usuariosDB) => {
+        workerModel_1.default.find({ colaborador_role: role }, (err, usuariosDB) => {
             if (err) {
                 return res.json({
                     ok: false,

@@ -22,15 +22,15 @@ const PedidoSchema = new Schema({
     archivos: [{ type: Schema.Types.ObjectId, ref: 'archivos' }],
     // etapa_pedido: { type: Schema.Types.ObjectId, ref: 'etapaPedido' },
     // prioridad_pedido: { type: Schema.Types.ObjectId, ref: 'prioridadPedido' },
-    prioridad_pedido: { type: String, default: 'Normal' }, // Urgente/Normal
-    etapa_pedido: { type: String, default: 'Pedido pendiente' }, // 'Pedido pendiente', 'Diseño gráfico', 'Producción', 'Por entregrar', 'Entregado'
+    prioridad_pedido: { type: Number, default: 1 }, // Urgente/Normal
+    etapa_pedido: { type: Number, default: 0 }, // 'Pedido pendiente', 'Diseño gráfico', 'Producción', 'Por entregrar', 'Entregado'
     sucursal: { type: Schema.Types.ObjectId, ref: 'sucursales' },
     asignado_a: { type: Schema.Types.ObjectId, ref: 'userWorker' }, // Debe ser diseñador role
     origen_pedido: { type: Schema.Types.ObjectId, ref: 'origenPedido' },
     productos_pedidos: [{ type: Schema.Types.ObjectId, ref: 'productoPedido' }],
     pagos_pedido: [{ type: Schema.Types.ObjectId, ref: 'pagos' }],
     estado: { type: Boolean, default: true },
-    estado_pedido: { type: String, default: 'Normal' }, // 'Normal', 'Cambios', 'Aprobados', 'Corregir', 'Impreso'
+    estado_pedido: { type: Number, default: 0 }, // 'Normal', 'Cambios', 'Aprobados', 'Corregir', 'Impreso'
     // itbms: { type: Boolean, default: false },
     // monto_itbms: { type: Number, default: 0 },
     // subtotal: { type: Number, default: 0 },
