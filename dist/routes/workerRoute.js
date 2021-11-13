@@ -63,6 +63,13 @@ workerRouter.get('/obtenerUsuariosRole', [auth_1.verificaToken], (req, resp) => 
     obtenerUsuariosRole.obtenerUsuariosRole(req, resp);
 });
 // ==================================================================== //
+// Obtener un usuario por Sucursal y Role
+// ==================================================================== //
+workerRouter.get('/cargarUsuariosSucursalRole', [auth_1.verificaToken], (req, resp) => {
+    const cargarUsuariosSucursalRole = new workerClass_1.WorkkerClass();
+    cargarUsuariosSucursalRole.cargarUsuariosSucursalRole(req, resp);
+});
+// ==================================================================== //
 // Obtener un usuario por criterio nombre
 // ==================================================================== //
 workerRouter.get('/obtenerUsuarioCriterioNombre', [auth_1.verificaToken], (req, resp) => {

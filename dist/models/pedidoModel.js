@@ -32,7 +32,8 @@ const PedidoSchema = new Schema({
     // monto_itbms: { type: Number, default: 0 },
     // subtotal: { type: Number, default: 0 },
     saldo: { type: Number, default: 0 },
-    total: { type: Number, default: 0 }
+    total: { type: Number, default: 0 },
+    bandeja: { type: Schema.Types.ObjectId, ref: 'userWorker' }
 });
 // validacion para único elemento
 PedidoSchema.plugin(mongoose_unique_validator_1.default, { message: '{PATH}, ya existe!!' });

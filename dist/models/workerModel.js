@@ -25,7 +25,7 @@ const WorkerUserSchema = new Schema({
     observacion: { type: String },
     cantVisitas: { type: Number, default: 0 },
     estado: { type: Boolean, default: true },
-    sucursal: { type: String },
+    sucursal: { type: mongoose_1.default.Types.ObjectId, ref: 'sucursales' },
 });
 // validacion para único elemento
 WorkerUserSchema.plugin(mongoose_unique_validator_1.default, { message: '{PATH}, ya existe!!' });

@@ -85,6 +85,15 @@ workerRouter.get('/obtenerUsuariosRole', [verificaToken], (req: Request, resp: R
 });
 
 // ==================================================================== //
+// Obtener un usuario por Sucursal y Role
+// ==================================================================== //
+workerRouter.get('/cargarUsuariosSucursalRole', [verificaToken], (req: Request, resp: Response) => {
+
+    const cargarUsuariosSucursalRole = new WorkkerClass();
+    cargarUsuariosSucursalRole.cargarUsuariosSucursalRole(req, resp);
+});
+
+// ==================================================================== //
 // Obtener un usuario por criterio nombre
 // ==================================================================== //
 workerRouter.get('/obtenerUsuarioCriterioNombre', [verificaToken], (req: Request, resp: Response) => {
@@ -142,7 +151,7 @@ workerRouter.post('/loguearUsuario', (req: Request, resp: Response) => {
 // Decodificar token
 // ==================================================================== //
 workerRouter.get('/decodificarToken', (req: Request, resp: Response) => {
-    
+
     const decodificarToken = new WorkkerClass();
     decodificarToken.decodificarToken(req, resp);
 });
@@ -151,7 +160,7 @@ workerRouter.get('/decodificarToken', (req: Request, resp: Response) => {
 // Refrescar token
 // ==================================================================== //
 workerRouter.post('/refrescarToken', (req: Request, resp: Response) => {
-    
+
     const refrescarToken = new WorkkerClass();
     refrescarToken.refrescarToken(req, resp);
 });

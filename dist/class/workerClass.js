@@ -17,6 +17,7 @@ const nanoid_1 = require("nanoid");
 const moment_1 = __importDefault(require("moment"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const mongoose = require('mongoose');
 const environment_1 = require("../environment/environment");
 // Modelo
 const workerModel_1 = __importDefault(require("../models/workerModel"));
@@ -375,7 +376,6 @@ class WorkkerClass {
         // const estadoHeader: string = req.get('estado');
         // const estado: boolean = castEstado(estadoHeader);
         const role = req.get('role');
-        // console.log(req.usuario.role);
         workerModel_1.default.find({ colaborador_role: role }, (err, usuariosDB) => {
             if (err) {
                 return res.json({
@@ -671,6 +671,70 @@ class WorkkerClass {
                 usuario: usuarioDB,
                 token: this.token
             });
+        });
+    }
+    cargarUsuariosSucursalRole(req, resp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const role = req.get('role');
+            const sucursal = req.get('sucursal');
+            const match = {
+                $match: {}
+            };
+            if (role !== 'null' && sucursal === 'null') {
+                switch (role) {
+                    case 'prod':
+                        match.$match = { $or: [{ 'colaborador_role': 'ProduccionVIPRole' }, { 'colaborador_role': 'ProduccionNormalRole' }] };
+                        break;
+                    case 'vend':
+                        match.$match = { $or: [{ 'colaborador_role': 'VendedorVIPRole' }, { 'colaborador_role': 'VendedorNormalRole' }] };
+                        break;
+                    case 'dise':
+                        match.$match = { 'colaborador_role': 'DiseniadorRole' };
+                        break;
+                    case 'admin':
+                        match.$match = { 'colaborador_role': 'AdminRole' };
+                        break;
+                }
+            }
+            if (role === 'null' && sucursal !== 'null') {
+                match.$match = { 'sucursal': new mongoose.Types.ObjectId(sucursal) };
+            }
+            if (sucursal !== 'null' && role !== 'null') {
+                switch (role) {
+                    case 'prod':
+                        match.$match = { $and: [{ $or: [{ 'colaborador_role': 'ProduccionVIPRole' }, { 'colaborador_role': 'ProduccionNormalRole' }] }, { 'sucursal': new mongoose.Types.ObjectId(sucursal) }] };
+                        break;
+                    case 'vend':
+                        match.$match = { $and: [{ $or: [{ 'colaborador_role': 'VendedorVIPRole' }, { 'colaborador_role': 'VendedorNormalRole' }] }, { 'sucursal': new mongoose.Types.ObjectId(sucursal) }] };
+                        break;
+                    case 'dise':
+                        match.$match = { 'colaborador_role': 'DiseniadorRole', 'sucursal': new mongoose.Types.ObjectId(sucursal) };
+                        break;
+                    case 'admin':
+                        match.$match = { 'colaborador_role': 'AdminRole', 'sucursal': new mongoose.Types.ObjectId(sucursal) };
+                        break;
+                }
+            }
+            if (sucursal === 'null' && role === 'null') {
+                match.$match = { $or: [{ 'colaborador_role': 'ProduccionVIPRole' }, { 'colaborador_role': 'ProduccionNormalRole' }, { 'colaborador_role': 'VendedorVIPRole' }, { 'colaborador_role': 'VendedorNormalRole' }, { 'colaborador_role': 'DiseniadorRole' }, { 'colaborador_role': 'AdminRole' }] };
+            }
+            const usuariosDB = yield workerModel_1.default.aggregate([
+                {
+                    $lookup: {
+                        from: 'sucursales',
+                        localField: 'sucursal',
+                        foreignField: '_id',
+                        as: 'DiseniadorSucursal'
+                    }
+                },
+                match,
+            ]);
+            if (usuariosDB) {
+                return resp.json({
+                    ok: true,
+                    usuariosDB
+                });
+            }
         });
     }
 }

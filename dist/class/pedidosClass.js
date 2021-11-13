@@ -65,48 +65,56 @@ class PedidosClass {
     }
     editarPedido(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {
-            const id = req.get('id');
+            // cargar los usuarios workers de la sucursal del pedido
+            // todas las bandeja de produccion tienen la etapa produccion
+            // todo va guardado basado en la sucursal
+            const id = new mongoose.Types.ObjectId(req.get('id'));
             const sucursal = req.body.sucursal;
             const etapa_pedido = req.body.etapa_pedido;
             const prioridad_pedido = req.body.prioridad_pedido;
             const asignado_a = req.body.asignado_a;
             const estado_pedido = req.body.estado_pedido;
-            const itbms = req.body.itbms;
+            const origen_pedido = req.body.origen_pedido;
+            const fecha_entrega = req.body.fecha_entrega;
+            // const itbms = req.body.itbms;
             let montoItbms = 0;
             let total = 0;
-            const estadoHeader = req.get('estado');
-            const estado = (0, castEstado_1.castEstado)(estadoHeader);
-            const itbm_s = (0, castEstado_1.castITBMS)(itbms);
+            // const estadoHeader: string = req.get('estado');
+            // const estado: boolean = castEstado(estadoHeader);
+            // const itbm_s: boolean = castITBMS(itbms);
             const bitacora = new bitacoraClass_1.BitacoraClass();
             const pedidoDB = yield pedidoModel_1.default.findById(id)
                 .populate('sucursal')
-                .populate('etapa_pedido')
-                .populate('prioridad_pedido')
+                // .populate('etapa_pedido')
+                // .populate('prioridad_pedido')
                 .populate('asignado_a')
+                .populate('origen_pedido')
                 .exec();
-            if (pedidoDB.productos_pedidos.length <= 0) {
-                return resp.json({
-                    ok: false,
-                    mensaje: `Debe agregar un producto para poder editar un pedido`
-                });
-            }
-            if (pedidoDB.itbms !== itbm_s) {
-                // Existen pagos
-                if (pedidoDB.pagos_pedido.length > 0) {
-                    return resp.json({
-                        ok: false,
-                        mensaje: `No puede editar el pedido ya que existen pagos registrados`
-                    });
-                }
-            }
+            // if (pedidoDB.productos_pedidos.length <= 0) {
+            //     return resp.json({
+            //         ok: false,
+            //         mensaje: `Debe agregar un producto para poder editar un pedido`
+            //     });
+            // }
+            // if (pedidoDB.itbms !== itbm_s) {
+            //     // Existen pagos
+            //     if (pedidoDB.pagos_pedido.length > 0) {
+            //         return resp.json({
+            //             ok: false,
+            //             mensaje: `No puede editar el pedido ya que existen pagos registrados`
+            //         });
+            //     }
+            // }
             const query = {
                 sucursal: sucursal,
                 etapa_pedido: etapa_pedido,
                 prioridad_pedido: prioridad_pedido,
                 asignado_a: asignado_a,
-                estado: estado,
+                // estado: estado,
                 estado_pedido: estado_pedido,
-                itbms: itbms
+                origen_pedido: origen_pedido,
+                fecha_entrega: fecha_entrega
+                // itbms: itbms
             };
             if (!query.sucursal) {
                 query.sucursal = pedidoDB.sucursal;
@@ -120,30 +128,35 @@ class PedidosClass {
             if (!query.asignado_a) {
                 query.asignado_a = pedidoDB.asignado_a;
             }
-            if (!query.estado) {
-                query.estado = pedidoDB.estado;
-            }
-            if (!query.itbms) {
-                query.itbms = pedidoDB.itbms;
-            }
-            else {
-                if (itbm_s === true) {
-                    montoItbms = parseFloat((pedidoDB.subtotal * 0.07).toFixed(2));
-                    total = parseFloat((pedidoDB.subtotal + montoItbms).toFixed(2));
-                    Object.assign(query, { monto_itbms: montoItbms, total: total });
-                }
-                else if (itbm_s === false) {
-                    Object.assign(query, { monto_itbms: 0, total: (pedidoDB.subtotal + 0) });
-                }
-            }
+            // if (!query.estado) {
+            //     query.estado = pedidoDB.estado;
+            // }
+            // if (!query.itbms) {
+            //     query.itbms = pedidoDB.itbms;
+            // } else {
+            //     if (itbm_s === true) {
+            //         montoItbms = parseFloat((pedidoDB.subtotal * 0.07).toFixed(2));
+            //         total = parseFloat((pedidoDB.subtotal + montoItbms).toFixed(2));
+            //         Object.assign(query, { monto_itbms: montoItbms, total: total });
+            //     } else if (itbm_s === false) {
+            //         Object.assign(query, { monto_itbms: 0, total: (pedidoDB.subtotal + 0) });
+            //     }
+            // }
             if (!query.estado_pedido) {
                 query.estado_pedido = pedidoDB.estado_pedido;
             }
+            if (!query.origen_pedido) {
+                query.origen_pedido = pedidoDB.origen_pedido;
+            }
+            if (!query.fecha_entrega) {
+                query.fecha_entrega = pedidoDB.fecha_entrega;
+            }
             pedidoModel_1.default.findByIdAndUpdate(id, query, { new: true })
                 .populate('sucursal')
-                .populate('etapa_pedido')
-                .populate('prioridad_pedido')
+                // .populate('etapa_pedido')
+                // .populate('prioridad_pedido')
                 .populate('asignado_a')
+                .populate('origen_pedido')
                 .exec((err, pedidoActualizadoDB) => __awaiter(this, void 0, void 0, function* () {
                 if (err) {
                     return resp.json({
@@ -168,6 +181,8 @@ class PedidosClass {
                     yield bitacora.crearBitacora(req, `Cambió el estado del pedido a ${pedidoActualizadoDB.estado_pedido}`, pedidoDB._id);
                 }
                 return resp.json({
+                    ok: true,
+                    mensaje: 'Pedido actualizado',
                     pedidoActualizadoDB,
                     // pedidoDB: pedidoDB
                 });
@@ -187,6 +202,7 @@ class PedidosClass {
             .populate('cliente')
             .populate('asignado_a')
             .populate('sucursal')
+            .populate('origen_pedido')
             .exec((err, pedidoDB) => {
             if (err) {
                 return resp.json({
@@ -838,7 +854,7 @@ class PedidosClass {
                         match.$match = { $or: [{ 'AsignadoA.colaborador_role': 'ProduccionVIPRole' }, { 'AsignadoA.colaborador_role': 'ProduccionNormalRole' }] };
                         break;
                     case 'vend':
-                        match.$match = { $or: [{ 'AsignadoA.colaborador_role': 'VendedorVIPRole' }, { 'AsignadoA.colaborador_role': 'VendedorNormalRole' }] };
+                        match.$match = { $or: [{ 'IDCreador.colaborador_role': 'VendedorVIPRole' }, { 'IDCreador.colaborador_role': 'VendedorNormalRole' }] };
                         break;
                     case 'dise':
                         match.$match = { 'AsignadoA.colaborador_role': 'DiseniadorRole' };

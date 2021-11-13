@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 import moment from 'moment';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+const mongoose = require('mongoose');
 import { environmnet } from '../environment/environment';
 
 // Interface
@@ -451,9 +452,7 @@ export class WorkkerClass {
 
         const role = req.get('role');
 
-        // console.log(req.usuario.role);
-
-        workerModel.find({  colaborador_role: role}, (err: CallbackError, usuariosDB: Array<WorkerModelInterface>) => { // , { estado: estado }]
+        workerModel.find({ colaborador_role: role }, (err: CallbackError, usuariosDB: Array<WorkerModelInterface>) => { // , { estado: estado }]
 
             if (err) {
                 return res.json({
@@ -845,6 +844,80 @@ export class WorkkerClass {
 
         });
 
+    }
+
+    async cargarUsuariosSucursalRole(req: any, resp: Response): Promise<any> {
+
+        const role = req.get('role');
+        const sucursal = req.get('sucursal');
+        const match: any = {
+            $match: {}
+        };
+
+        if (role !== 'null' && sucursal === 'null') {
+
+            switch (role) {
+                case 'prod':
+                    match.$match = { $or: [{ 'colaborador_role': 'ProduccionVIPRole' }, { 'colaborador_role': 'ProduccionNormalRole' }] }
+                    break;
+                case 'vend':
+                    match.$match = { $or: [{ 'colaborador_role': 'VendedorVIPRole' }, { 'colaborador_role': 'VendedorNormalRole' }] }
+                    break;
+                case 'dise':
+                    match.$match = { 'colaborador_role': 'DiseniadorRole' }
+                    break;
+                case 'admin':
+                    match.$match = { 'colaborador_role': 'AdminRole' }
+                    break;
+            }
+        }
+
+        if (role === 'null' && sucursal !== 'null') {
+
+            match.$match = { 'sucursal': new mongoose.Types.ObjectId(sucursal) }
+        }
+
+        if (sucursal !== 'null' && role !== 'null') {
+            switch (role) {
+                case 'prod':
+                    match.$match = { $and: [{ $or: [{ 'colaborador_role': 'ProduccionVIPRole' }, { 'colaborador_role': 'ProduccionNormalRole' }] }, { 'sucursal': new mongoose.Types.ObjectId(sucursal) }] }
+                    break;
+                case 'vend':
+                    match.$match = { $and: [{ $or: [{ 'colaborador_role': 'VendedorVIPRole' }, { 'colaborador_role': 'VendedorNormalRole' }] }, { 'sucursal': new mongoose.Types.ObjectId(sucursal) }] }
+                    break;
+                case 'dise':
+                    match.$match = { 'colaborador_role': 'DiseniadorRole', 'sucursal': new mongoose.Types.ObjectId(sucursal) }
+                    break;
+                case 'admin':
+                    match.$match = { 'colaborador_role': 'AdminRole', 'sucursal': new mongoose.Types.ObjectId(sucursal) }
+                    break;
+            }
+        }
+
+        if (sucursal === 'null' && role === 'null') {
+            match.$match = { $or: [{ 'colaborador_role': 'ProduccionVIPRole' }, { 'colaborador_role': 'ProduccionNormalRole' }, { 'colaborador_role': 'VendedorVIPRole' }, { 'colaborador_role': 'VendedorNormalRole' }, { 'colaborador_role': 'DiseniadorRole' }, { 'colaborador_role': 'AdminRole' }] }
+        }
+
+
+        const usuariosDB = await workerModel.aggregate([
+            {
+                $lookup: {
+                    from: 'sucursales',
+                    localField: 'sucursal',
+                    foreignField: '_id',
+                    as: 'DiseniadorSucursal'
+                }
+            },
+            match,
+        ]);
+
+        if (usuariosDB) {
+
+            return resp.json({
+                ok: true,
+                usuariosDB
+            });
+        }
     }
 }
 
