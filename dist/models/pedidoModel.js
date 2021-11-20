@@ -33,7 +33,7 @@ const PedidoSchema = new Schema({
     // subtotal: { type: Number, default: 0 },
     saldo: { type: Number, default: 0 },
     total: { type: Number, default: 0 },
-    bandeja: { type: Schema.Types.ObjectId, ref: 'userWorker' }
+    // bandeja: { type: String, default: 'todos' } // todos, produccion, diseniador, vendedor, admin-super
 });
 // validacion para único elemento
 PedidoSchema.plugin(mongoose_unique_validator_1.default, { message: '{PATH}, ya existe!!' });

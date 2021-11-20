@@ -162,12 +162,12 @@ class WorkkerClass {
                     mensaje: `No se encontró un usuario con ese ID en la base de datos`
                 });
             }
-            if (req.usuario.correo === usuarioDB.correo) {
-                return res.json({
-                    ok: false,
-                    mensaje: `No puede editar su mismo usuario`
-                });
-            }
+            // if (req.usuario.correo === usuarioDB.correo) {
+            //     return res.json({
+            //         ok: false,
+            //         mensaje: `No puede editar su mismo usuario`
+            //     });
+            // }
             if (!req.body.nombre) {
                 datosNuevos.nombre = usuarioDB.nombre;
             }
@@ -626,7 +626,7 @@ class WorkkerClass {
     decodificarToken(req, resp) {
         const token = req.get('token');
         // Comprobación del token
-        jsonwebtoken_1.default.verify(token, environment_1.environmnet.SEED, (err, decoded) => {
+        jsonwebtoken_1.default.verify(token, environment_1.environmnet.SEED, (err, decoded) => __awaiter(this, void 0, void 0, function* () {
             if (err) {
                 return resp.json({
                     ok: false,
@@ -635,16 +635,28 @@ class WorkkerClass {
                 });
             }
             else {
+                const usuario = yield workerModel_1.default.findById(decoded.usuario._id)
+                    .populate('sucursal')
+                    .exec();
+                if (!usuario) {
+                    return resp.json({
+                        ok: false,
+                        mensaje: `Error interno`,
+                        usuario
+                    });
+                }
+                usuario.password = ':)';
                 return resp.json({
                     ok: true,
                     mensaje: `Token correcto`,
-                    usuario: decoded.usuario,
+                    // usuario: decoded.usuario,
+                    usuario: usuario,
                     token,
                     iat: decoded.iat,
                     exp: decoded.exp,
                 });
             }
-        });
+        }));
     }
     refrescarToken(req, resp) {
         const idUsuario = req.body.idUsuario;

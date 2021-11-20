@@ -180,11 +180,11 @@ class Product {
     }
     // Obtener productos por criterio nombre
     obtenerProductoCriterioNombre(req, res) {
-        const estadoHeader = req.get('estado');
-        const estado = (0, castEstado_1.castEstado)(estadoHeader);
-        const criterioNombre = req.body.criterioNombre;
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
+        const criterioNombre = req.get('criterioNombre');
         // /^[a-zA-ZáéíóúÁÉÍÓU]+$/
-        productModel_1.default.find({ nombre: { $regex: criterioNombre, $options: 'i' }, estado: estado }, (err, productoDB) => {
+        productModel_1.default.find({ nombre: { $regex: criterioNombre, $options: 'i' } }, (err, productoDB) => {
             if (err) {
                 return res.json({
                     ok: false,

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PedidosClass = void 0;
 const mongoose = require('mongoose');
+// import { nanoid } from 'nanoid';
 const nanoid_1 = require("nanoid");
 const environment_1 = require("../environment/environment");
 const moment_1 = __importDefault(require("moment"));
@@ -27,28 +28,48 @@ const castEstado_1 = require("../functions/castEstado");
 class PedidosClass {
     constructor() {
         this.pathIds = `pedidosIDs.json`;
-        this.idRef = (0, nanoid_1.nanoid)(10);
+        // this.idRef = nanoid(10);
+        this.idRef = (0, nanoid_1.customAlphabet)('1234567890', 9);
     }
     crearPedido(req, resp) {
         const idCreador = req.usuario._id;
-        const idReferencia = this.idRef;
+        // const idReferencia = this.idRef;
+        const idReferencia = this.idRef();
         const fecha_alta = (0, moment_1.default)().format('YYYY-MM-DD');
         // const fecha_alta = moment().format('2021-04-15');
         // const fecha_entrega = moment().add(3, 'days').format('YYYY-MM-DD');
         const fecha_entrega = req.body.fecha_entrega;
         const cliente = req.get('cliente');
         const sucursal = req.get('sucursal');
+        const vendedor = req.get('vendedor');
         // const origenPedido = req.get('origen');
-        const crearNuevoPedido = new pedidoModel_1.default({
-            idCreador: idCreador,
-            idReferencia: idReferencia,
-            fecha_alta: fecha_alta,
-            fecha_entrega: fecha_entrega,
-            cliente: cliente,
-            sucursal: sucursal,
-            // origen_pedido: origenPedido
-        });
-        crearNuevoPedido.save((err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
+        const crearPedido = () => {
+            const crearNuevoPedido = new pedidoModel_1.default({
+                idCreador: idCreador,
+                idReferencia: idReferencia,
+                fecha_alta: fecha_alta,
+                fecha_entrega: fecha_entrega,
+                cliente: cliente,
+                sucursal: sucursal,
+                // asignado_a: vendedor
+                // origen_pedido: origenPedido
+            });
+            crearNuevoPedido.save((err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
+                if (err) {
+                    return resp.json({
+                        ok: false,
+                        mensaje: `Error interno`,
+                        err
+                    });
+                }
+                return resp.json({
+                    ok: true,
+                    mensaje: `Pedido creado`,
+                    pedidoDB,
+                });
+            }));
+        };
+        pedidoModel_1.default.find({ cliente: cliente }, (err, pedidosDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
@@ -56,12 +77,24 @@ class PedidosClass {
                     err
                 });
             }
-            return resp.json({
-                ok: true,
-                mensaje: `Pedido creado`,
-                pedidoDB,
-            });
-        }));
+            if (pedidosDB.length === 0) {
+                crearPedido();
+            }
+            else {
+                const hayPendientes = pedidosDB.find((pedido) => pedido.etapa_pedido === 0);
+                if (hayPendientes) {
+                    // console.log('hay pendientes');
+                    return resp.json({
+                        ok: false,
+                        mensaje: `Este cliente tiene pedidos pendientes`
+                    });
+                }
+                else {
+                    // console.log('no hay pendientes');
+                    crearPedido();
+                }
+            }
+        });
     }
     editarPedido(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -328,7 +361,7 @@ class PedidosClass {
                 //     $match: { estado: true } // estado: estado
                 // },
                 {
-                    $sort: { prioridad_pedido: 1, fecha_actual: 1 }
+                    $sort: { etapa_pedido: 1, prioridad_pedido: 1, fecha_actual: 1 } // prioridad_pedido: 1, fecha_actual: 1
                 },
                 {
                     $unset: ['IDCreador.password', 'EtapaPedido.nivel', 'PrioridadPedido.nivel']
@@ -848,10 +881,13 @@ class PedidosClass {
             if (bandejas === 'null' && userID === 'null' && sucursal === 'null') {
                 match.$match;
             }
+            if (bandejas === 'null' && userID !== 'null' && sucursal !== 'null') {
+                match.$match = { $and: [{ 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }, { 'AsignadoA._id': new mongoose.Types.ObjectId(userID) }, { 'AsignadoA.colaborador_role': role }] };
+            }
             if (bandejas !== 'null' && userID === 'null' && sucursal === 'null') {
                 switch (bandejas) {
                     case 'prod':
-                        match.$match = { $or: [{ 'AsignadoA.colaborador_role': 'ProduccionVIPRole' }, { 'AsignadoA.colaborador_role': 'ProduccionNormalRole' }] };
+                        match.$match = { 'etapa_pedido': 2 };
                         break;
                     case 'vend':
                         match.$match = { $or: [{ 'IDCreador.colaborador_role': 'VendedorVIPRole' }, { 'IDCreador.colaborador_role': 'VendedorNormalRole' }] };
@@ -860,34 +896,65 @@ class PedidosClass {
                         match.$match = { 'AsignadoA.colaborador_role': 'DiseniadorRole' };
                         break;
                     case 'admin':
-                        match.$match = { 'AsignadoA.colaborador_role': 'AdminRole' };
+                        match.$match = { 'IDCreador.colaborador_role': 'AdminRole' };
                         break;
                 }
             }
             if (bandejas !== 'null' && userID !== 'null' && sucursal === 'null') {
-                match.$match = { $and: [{ 'AsignadoA._id': new mongoose.Types.ObjectId(userID) }, { 'AsignadoA.colaborador_role': role }] };
+                // match.$match = { $and: [{ 'AsignadoA._id': new mongoose.Types.ObjectId(userID) }, { 'AsignadoA.colaborador_role': role }] }
+                switch (bandejas) {
+                    // case 'prod':
+                    //     match.$match = { $and: [{ 'etapa_pedido': 2 }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] }
+                    //     break;
+                    case 'vend':
+                        match.$match = { $and: [{ $or: [{ 'IDCreador.colaborador_role': 'VendedorVIPRole' }, { 'IDCreador.colaborador_role': 'VendedorNormalRole' }] }, { 'IDCreador._id': new mongoose.Types.ObjectId(userID) }] };
+                        break;
+                    case 'dise':
+                        match.$match = { 'AsignadoA._id': new mongoose.Types.ObjectId(userID) };
+                        break;
+                    case 'admin':
+                        match.$match = { 'IDCreador._id': new mongoose.Types.ObjectId(userID) };
+                        break;
+                }
             }
             if (bandejas !== 'null' && userID === 'null' && sucursal !== 'null') {
                 switch (bandejas) {
                     case 'prod':
-                        match.$match = { $and: [{ $or: [{ 'AsignadoA.colaborador_role': 'ProduccionVIPRole' }, { 'AsignadoA.colaborador_role': 'ProduccionNormalRole' }] }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                        match.$match = { $and: [{ 'etapa_pedido': 2 }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
                         break;
                     case 'vend':
-                        match.$match = { $and: [{ $or: [{ 'AsignadoA.colaborador_role': 'VendedorVIPRole' }, { 'AsignadoA.colaborador_role': 'VendedorNormalRole' }] }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                        match.$match = { $and: [{ $or: [{ 'IDCreador.colaborador_role': 'VendedorVIPRole' }, { 'IDCreador.colaborador_role': 'VendedorNormalRole' }] }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
                         break;
                     case 'dise':
                         match.$match = { $and: [{ 'AsignadoA.colaborador_role': 'DiseniadorRole' }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
                         break;
                     case 'admin':
-                        match.$match = { $and: [{ 'AsignadoA.colaborador_role': 'AdminRole' }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                        match.$match = { $and: [{ 'IDCreador.colaborador_role': 'AdminRole' }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
                         break;
                 }
             }
             if (sucursal !== 'null' && userID === 'null' && bandejas === 'null') {
                 match.$match = { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) };
             }
+            if (bandejas === 'null' && userID !== 'null' && sucursal === 'null') {
+                match.$match = { $and: [{ 'AsignadoA._id': new mongoose.Types.ObjectId(userID) }, { 'AsignadoA.colaborador_role': role }] };
+            }
             if (sucursal !== 'null' && userID !== 'null' && bandejas !== 'null') {
-                match.$match = { $and: [{ 'AsignadoA._id': new mongoose.Types.ObjectId(userID) }, { 'AsignadoA.colaborador_role': role }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                switch (bandejas) {
+                    case 'prod':
+                        match.$match = { $and: [{ 'etapa_pedido': 2 }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                        break;
+                    case 'vend':
+                        match.$match = { $and: [{ 'IDCreador._id': new mongoose.Types.ObjectId(userID) }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                        break;
+                    case 'dise':
+                        match.$match = { $and: [{ 'AsignadoA.colaborador_role': 'DiseniadorRole' }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                        break;
+                    case 'admin':
+                        match.$match = { $and: [{ 'IDCreador.colaborador_role': 'AdminRole' }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] };
+                        break;
+                }
+                // match.$match = { $and: [{ 'AsignadoA._id': new mongoose.Types.ObjectId(userID) }, { 'AsignadoA.colaborador_role': role }, { 'Sucursal._id': new mongoose.Types.ObjectId(sucursal) }] }
             }
             const pedidosDB = yield pedidoModel_1.default.aggregate([
                 {
@@ -971,7 +1038,7 @@ class PedidosClass {
                     }
                 },
                 {
-                    $sort: { prioridad_pedido: 1, fecha_actual: 1 }
+                    $sort: { etapa_pedido: 1, prioridad_pedido: 1, fecha_actual: 1 }
                 },
                 match,
                 {
