@@ -14,8 +14,8 @@ export interface PedidoModelInterface {
     fecha_entrega: string;
     cliente: ClientModelInterface;
     archivos: Array<ArchivosInterface>;
-    etapa_pedido: EtapaPedidoInterface;
-    prioridad_pedido: PrioridadPedidoInterface;
+    etapa_pedido: number;
+    prioridad_pedido: number;
     sucursal: SucursalModel;
     asignado_a: WorkerModelInterface;
     origen_pedido: OrigenPedidoInterface;

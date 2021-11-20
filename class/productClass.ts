@@ -166,30 +166,30 @@ export class Product {
         const id = req.get('id') || '';
 
         productModel.findById(id)
-        .populate('sucursal')
-        .populate('categoria')
-        .exec((err: any, productoDB: any) => {
+            .populate('sucursal')
+            .populate('categoria')
+            .exec((err: any, productoDB: any) => {
 
-            if (err) {
+                if (err) {
+                    return res.json({
+                        ok: false,
+                        mensaje: `Error al búscar producto o no existe`,
+                        err
+                    });
+                }
+
+                if (!productoDB) {
+                    return res.json({
+                        ok: false,
+                        mensaje: `No existe el producto en la base de datos`
+                    });
+                }
+
                 return res.json({
-                    ok: false,
-                    mensaje: `Error al búscar producto o no existe`,
-                    err
+                    ok: true,
+                    productoDB
                 });
-            }
-
-            if (!productoDB) {
-                return res.json({
-                    ok: false,
-                    mensaje: `No existe el producto en la base de datos`
-                });
-            }
-
-            return res.json({
-                ok: true,
-                productoDB
             });
-        });
     }
 
     // Obtener usuario por ID Referencia
@@ -224,13 +224,13 @@ export class Product {
     // Obtener productos por criterio nombre
     obtenerProductoCriterioNombre(req: any, res: Response): void {
 
-        const estadoHeader: string = req.get('estado');
-        const estado: boolean = castEstado(estadoHeader);
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
 
-        const criterioNombre = req.body.criterioNombre;
+        const criterioNombre = req.get('criterioNombre');
         // /^[a-zA-ZáéíóúÁÉÍÓU]+$/
 
-        productModel.find({ nombre: { $regex: criterioNombre, $options: 'i' }, estado: estado }, (err: CallbackError, productoDB: Array<ProductModelInterface>) => {
+        productModel.find({ nombre: { $regex: criterioNombre, $options: 'i' } }, (err: CallbackError, productoDB: Array<ProductModelInterface>) => { //  estado: estado 
 
             if (err) {
                 return res.json({
@@ -262,34 +262,34 @@ export class Product {
     obtenerProductos(req: any, res: Response): void {
 
         productModel.find({})
-        .populate('sucursal')
-        .populate('categoria')
-        .exec((err: any, productosDB: Array<any>) => { // estado: estado 
+            .populate('sucursal')
+            .populate('categoria')
+            .exec((err: any, productosDB: Array<any>) => { // estado: estado 
 
-            if (err) {
+                if (err) {
+                    return res.json({
+                        ok: false,
+                        mensaje: `Error interno`,
+                        err
+                    });
+
+                }
+
+                // if (!productosDB || productosDB.length === 0) {
+
+                //     return res.json({
+                //         ok: false,
+                //         mensaje: `No existen productos con ese criterio de búsqueda`,
+                //         productosDB
+                //     })
+                // }
+
                 return res.json({
-                    ok: false,
-                    mensaje: `Error interno`,
-                    err
+                    ok: true,
+                    productosDB
                 });
 
-            }
-
-            // if (!productosDB || productosDB.length === 0) {
-
-            //     return res.json({
-            //         ok: false,
-            //         mensaje: `No existen productos con ese criterio de búsqueda`,
-            //         productosDB
-            //     })
-            // }
-
-            return res.json({
-                ok: true,
-                productosDB
             });
-
-        });
     }
 
     // Obtener productos por sucursal

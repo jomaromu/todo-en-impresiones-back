@@ -392,7 +392,7 @@ class ProductoPedido {
                     itbmsProductoPedido = parseFloat((totalProductoPedido * 0.07).toFixed(2));
                     itbmsPedido = parseFloat(itbmsProductoPedido.toFixed(2));
                 }
-                if (existeProductoPedido === false) { // Primer producto pedido
+                if (existeProductoPedido === false) { // Primer producto pedido 
                     subtotalPedido = parseFloat(totalProductoPedido.toFixed(2));
                     itbmsPedido = parseFloat(pedidoDB.monto_itbms.toFixed(2)) + parseFloat(itbmsPedido.toFixed(2));
                     totalPedido = subtotalPedido + itbmsPedido;

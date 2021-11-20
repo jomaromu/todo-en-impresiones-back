@@ -31,12 +31,12 @@ const PedidoSchema = new Schema({
     pagos_pedido: [{ type: Schema.Types.ObjectId, ref: 'pagos' }],
     estado: { type: Boolean, default: true },
     estado_pedido: { type: Number, default: 0 }, // 'Normal', 'Cambios', 'Aprobados', 'Corregir', 'Impreso'
-    // itbms: { type: Boolean, default: false },
+    itbms: { type: Boolean, default: false },
     // monto_itbms: { type: Number, default: 0 },
     // subtotal: { type: Number, default: 0 },
     saldo: { type: Number, default: 0 },
     total: { type: Number, default: 0 },
-    bandeja: { type: Schema.Types.ObjectId, ref: 'userWorker' }
+    // bandeja: { type: String, default: 'todos' } // todos, produccion, diseniador, vendedor, admin-super
 });
 
 // validacion para único elemento

@@ -492,7 +492,7 @@ export class ProductoPedido {
                     itbmsPedido = parseFloat(itbmsProductoPedido.toFixed(2));
                 }
 
-                if (existeProductoPedido === false) { // Primer producto pedido
+                if (existeProductoPedido === false) { // Primer producto pedido 
 
 
                     subtotalPedido = parseFloat(totalProductoPedido.toFixed(2));

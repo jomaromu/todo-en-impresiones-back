@@ -183,13 +183,13 @@ export class WorkkerClass {
                 });
             }
 
-            if (req.usuario.correo === usuarioDB.correo) {
+            // if (req.usuario.correo === usuarioDB.correo) {
 
-                return res.json({
-                    ok: false,
-                    mensaje: `No puede editar su mismo usuario`
-                });
-            }
+            //     return res.json({
+            //         ok: false,
+            //         mensaje: `No puede editar su mismo usuario`
+            //     });
+            // }
 
             if (!req.body.nombre) {
                 datosNuevos.nombre = usuarioDB.nombre;
@@ -788,7 +788,7 @@ export class WorkkerClass {
         const token = req.get('token');
 
         // Comprobación del token
-        jwt.verify(token, environmnet.SEED, (err: any, decoded: any) => {
+        jwt.verify(token, environmnet.SEED, async (err: any, decoded: any) => {
 
             if (err) {
                 return resp.json({
@@ -798,10 +798,26 @@ export class WorkkerClass {
                 });
 
             } else {
+
+                const usuario = await workerModel.findById(decoded.usuario._id)
+                    .populate('sucursal')
+                    .exec();
+
+                if (!usuario) {
+                    return resp.json({
+                        ok: false,
+                        mensaje: `Error interno`,
+                        usuario
+                    });
+                }
+
+                usuario.password = ':)';
+
                 return resp.json({
                     ok: true,
                     mensaje: `Token correcto`,
-                    usuario: decoded.usuario,
+                    // usuario: decoded.usuario,
+                    usuario: usuario,
                     token,
                     iat: decoded.iat,
                     exp: decoded.exp,
