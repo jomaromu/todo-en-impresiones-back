@@ -109,7 +109,7 @@ class PedidosClass {
             const estado_pedido = req.body.estado_pedido;
             const origen_pedido = req.body.origen_pedido;
             const fecha_entrega = req.body.fecha_entrega;
-            // const itbms = req.body.itbms;
+            const itbms = req.body.itbms;
             let montoItbms = 0;
             let total = 0;
             // const estadoHeader: string = req.get('estado');
@@ -146,8 +146,8 @@ class PedidosClass {
                 // estado: estado,
                 estado_pedido: estado_pedido,
                 origen_pedido: origen_pedido,
-                fecha_entrega: fecha_entrega
-                // itbms: itbms
+                fecha_entrega: fecha_entrega,
+                itbms: itbms
             };
             if (!query.sucursal) {
                 query.sucursal = pedidoDB.sucursal;
@@ -184,13 +184,17 @@ class PedidosClass {
             if (!query.fecha_entrega) {
                 query.fecha_entrega = pedidoDB.fecha_entrega;
             }
+            // if (!query.itbms) {
+            //     query.itbms = pedidoDB.itbms;
+            // }
+            // console.log(itbms);
             pedidoModel_1.default.findByIdAndUpdate(id, query, { new: true })
                 .populate('sucursal')
                 // .populate('etapa_pedido')
                 // .populate('prioridad_pedido')
                 .populate('asignado_a')
                 .populate('origen_pedido')
-                .exec((err, pedidoActualizadoDB) => __awaiter(this, void 0, void 0, function* () {
+                .exec((err, pedidosDB) => __awaiter(this, void 0, void 0, function* () {
                 if (err) {
                     return resp.json({
                         ok: false,
@@ -199,24 +203,24 @@ class PedidosClass {
                     });
                 }
                 if (query.sucursal) {
-                    yield bitacora.crearBitacora(req, `Cambió sucursal del pedido a ${pedidoActualizadoDB.sucursal.nombre}`, pedidoDB._id);
+                    yield bitacora.crearBitacora(req, `Cambió sucursal del pedido a ${pedidosDB.sucursal.nombre}`, pedidoDB._id);
                 }
                 if (query.etapa_pedido) {
-                    yield bitacora.crearBitacora(req, `Cambió etapa del pedido a ${pedidoActualizadoDB.etapa_pedido.nombre}`, pedidoDB._id);
+                    yield bitacora.crearBitacora(req, `Cambió etapa del pedido a ${pedidosDB.etapa_pedido.nombre}`, pedidoDB._id);
                 }
                 if (query.prioridad_pedido) {
-                    yield bitacora.crearBitacora(req, `Cambió la prioridad del pedido a ${pedidoActualizadoDB.prioridad_pedido.nombre}`, pedidoDB._id);
+                    yield bitacora.crearBitacora(req, `Cambió la prioridad del pedido a ${pedidosDB.prioridad_pedido.nombre}`, pedidoDB._id);
                 }
                 if (query.asignado_a) {
-                    yield bitacora.crearBitacora(req, `Asginó el pedido a ${pedidoActualizadoDB.asignado_a.nombre}`, pedidoDB._id);
+                    yield bitacora.crearBitacora(req, `Asginó el pedido a ${pedidosDB.asignado_a.nombre}`, pedidoDB._id);
                 }
                 if (query.estado_pedido) {
-                    yield bitacora.crearBitacora(req, `Cambió el estado del pedido a ${pedidoActualizadoDB.estado_pedido}`, pedidoDB._id);
+                    yield bitacora.crearBitacora(req, `Cambió el estado del pedido a ${pedidosDB.estado_pedido}`, pedidoDB._id);
                 }
                 return resp.json({
                     ok: true,
                     mensaje: 'Pedido actualizado',
-                    pedidoActualizadoDB,
+                    pedidosDB,
                     // pedidoDB: pedidoDB
                 });
             }));

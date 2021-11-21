@@ -16,11 +16,11 @@ productoPedidoRouter.put('/editarProductoPedido', [verificaToken], (req: Request
     editarProductoPedido.editarProductoPedido(req, resp);
 });
 
-productoPedidoRouter.put('/inhabilitarProductoPedido', [verificaToken], (req: Request, resp: Response) => {
+// productoPedidoRouter.put('/inhabilitarProductoPedido', [verificaToken], (req: Request, resp: Response) => {
 
-    const inhabilitarProductoPedido = new ProductoPedido();
-    inhabilitarProductoPedido.inhabilitarProductoPedido(req, resp);
-});
+//     const inhabilitarProductoPedido = new ProductoPedido();
+//     inhabilitarProductoPedido.inhabilitarProductoPedido(req, resp);
+// });
 
 productoPedidoRouter.get('/obtenerProductoPedido', [verificaToken], (req: Request, resp: Response) => {
 

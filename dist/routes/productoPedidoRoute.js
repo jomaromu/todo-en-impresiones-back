@@ -12,10 +12,10 @@ productoPedidoRouter.put('/editarProductoPedido', [auth_1.verificaToken], (req, 
     const editarProductoPedido = new productoPedidoClass_1.ProductoPedido();
     editarProductoPedido.editarProductoPedido(req, resp);
 });
-productoPedidoRouter.put('/inhabilitarProductoPedido', [auth_1.verificaToken], (req, resp) => {
-    const inhabilitarProductoPedido = new productoPedidoClass_1.ProductoPedido();
-    inhabilitarProductoPedido.inhabilitarProductoPedido(req, resp);
-});
+// productoPedidoRouter.put('/inhabilitarProductoPedido', [verificaToken], (req: Request, resp: Response) => {
+//     const inhabilitarProductoPedido = new ProductoPedido();
+//     inhabilitarProductoPedido.inhabilitarProductoPedido(req, resp);
+// });
 productoPedidoRouter.get('/obtenerProductoPedido', [auth_1.verificaToken], (req, resp) => {
     const obtenerProductoPedido = new productoPedidoClass_1.ProductoPedido();
     obtenerProductoPedido.obtenerProductoPedido(req, resp);

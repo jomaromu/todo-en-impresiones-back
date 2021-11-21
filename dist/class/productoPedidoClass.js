@@ -44,12 +44,12 @@ class ProductoPedido {
                 });
             }
             // Existen pagos
-            if (pedidoDB.pagos_pedido.length > 0) {
-                return resp.json({
-                    ok: false,
-                    mensaje: `No puede agregar productos ya que existen pagos registrados`
-                });
-            }
+            // if (pedidoDB.pagos_pedido.length > 0) {
+            //     return resp.json({
+            //         ok: false,
+            //         mensaje: `No puede agregar productos ya que existen pagos registrados`
+            //     });
+            // }
             const productosPedidos = pedidoDB.productos_pedidos;
             // Si no hay productos pedidos
             if (productosPedidos.length === 0 || !productosPedidos) {
@@ -134,7 +134,7 @@ class ProductoPedido {
     obtenerPorPedido(req, resp) {
         const pedido = req.get('pedido');
         pedidoModel_1.default.findById(pedido)
-            .populate('productos_pedidos')
+            .populate({ path: 'productos_pedidos', populate: { path: 'producto' } })
             .exec((err, pedidoDB) => {
             if (err) {
                 return resp.json({
@@ -246,99 +246,98 @@ class ProductoPedido {
             });
         });
     }
-    inhabilitarProductoPedido(req, resp) {
-        const id = req.get('id');
-        const pedido = req.get('pedido');
-        let subtotalPedido = 0;
-        let itbmsPedido = 0;
-        let totalPedido = 0;
-        let totalProductoPedido = 0;
-        let itbmsProductoPedido = 0;
-        let query = {};
-        productoPedidoModel_1.default.findById(id, (err, productoPedidoDB) => {
-            if (err) {
-                return resp.json({
-                    ok: false,
-                    mensaje: `Error interno`,
-                    err
-                });
-            }
-            if (!productoPedidoDB) {
-                return resp.json({
-                    ok: false,
-                    mensaje: `No se encontró un producto pedido **`
-                });
-            }
-            if (productoPedidoDB.inhabilitado === true) {
-                return resp.json({
-                    ok: false,
-                    mensaje: `Este producto ya está inhabilitado`
-                });
-            }
-            productoPedidoModel_1.default.findByIdAndUpdate(id, { inhabilitado: true }, { new: true }, (err, productoPedidoInhabilitado) => {
-                if (err) {
-                    return resp.json({
-                        ok: false,
-                        mensaje: `Error interno`,
-                        err
-                    });
-                }
-                pedidoModel_1.default.findById(pedido)
-                    .exec((err, pedidoDB) => {
-                    if (err) {
-                        return resp.json({
-                            ok: false,
-                            mensaje: `Error interno`,
-                            err
-                        });
-                    }
-                    if (!pedidoDB) {
-                        return resp.json({
-                            ok: false,
-                            mensaje: `No se encontró un pedido para poder eliminar un producto`
-                        });
-                    }
-                    // Existen pagos
-                    if (pedidoDB.pagos_pedido.length > 0) {
-                        return resp.json({
-                            ok: false,
-                            mensaje: `No puede inhabilitar productos ya que existen pagos registrados`
-                        });
-                    }
-                    // ITBMS
-                    if (pedidoDB.itbms === true) {
-                        totalProductoPedido = parseFloat(productoPedidoInhabilitado.total.toFixed(2));
-                        itbmsProductoPedido = parseFloat((totalProductoPedido * 0.07).toFixed(2));
-                        itbmsPedido = parseFloat((pedidoDB.monto_itbms - itbmsProductoPedido).toFixed(2));
-                        subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoInhabilitado.total).toFixed(2));
-                        totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
-                    }
-                    else if (pedidoDB.itbms === false) {
-                        subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoInhabilitado.total).toFixed(2));
-                        totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
-                    }
-                    // Object.assign(query, { $pull: { productos_pedidos: id }, subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
-                    Object.assign(query, { subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
-                    pedidoModel_1.default.findByIdAndUpdate(pedido, query, { new: true })
-                        .exec((err, pedidoActualizadoDB) => __awaiter(this, void 0, void 0, function* () {
-                        if (err) {
-                            return resp.json({
-                                ok: false,
-                                mensaje: `Error interno`,
-                                err
-                            });
-                        }
-                        const bitacora = new bitacoraClass_1.BitacoraClass();
-                        yield bitacora.crearBitacora(req, 'Se inhabilitó un producto', pedidoDB._id);
-                        return resp.json({
-                            ok: true,
-                            pedidoActualizadoDB
-                        });
-                    }));
-                });
-            });
-        });
-    }
+    // inhabilitarProductoPedido(req: any, resp: Response): void {
+    //     const id = req.get('id');
+    //     const pedido = req.get('pedido');
+    //     let subtotalPedido: number = 0;
+    //     let itbmsPedido: number = 0;
+    //     let totalPedido: number = 0;
+    //     let totalProductoPedido: number = 0;
+    //     let itbmsProductoPedido: number = 0;
+    //     let query = {};
+    //     productoPedidoModel.findById(id, (err: CallbackError, productoPedidoDB: ProductoPedidoInterface) => {
+    //         if (err) {
+    //             return resp.json({
+    //                 ok: false,
+    //                 mensaje: `Error interno`,
+    //                 err
+    //             });
+    //         }
+    //         if (!productoPedidoDB) {
+    //             return resp.json({
+    //                 ok: false,
+    //                 mensaje: `No se encontró un producto pedido **`
+    //             });
+    //         }
+    //         if (productoPedidoDB.inhabilitado === true) {
+    //             return resp.json({
+    //                 ok: false,
+    //                 mensaje: `Este producto ya está inhabilitado`
+    //             });
+    //         }
+    //         productoPedidoModel.findByIdAndUpdate(id, { inhabilitado: true }, { new: true }, (err: CallbackError, productoPedidoInhabilitado: any) => {
+    //             if (err) {
+    //                 return resp.json({
+    //                     ok: false,
+    //                     mensaje: `Error interno`,
+    //                     err
+    //                 });
+    //             }
+    //             pedidoModel.findById(pedido)
+    //                 .exec((err: CallbackError, pedidoDB: any) => {
+    //                     if (err) {
+    //                         return resp.json({
+    //                             ok: false,
+    //                             mensaje: `Error interno`,
+    //                             err
+    //                         });
+    //                     }
+    //                     if (!pedidoDB) {
+    //                         return resp.json({
+    //                             ok: false,
+    //                             mensaje: `No se encontró un pedido para poder eliminar un producto`
+    //                         });
+    //                     }
+    //                     // Existen pagos
+    //                     if (pedidoDB.pagos_pedido.length > 0) {
+    //                         return resp.json({
+    //                             ok: false,
+    //                             mensaje: `No puede inhabilitar productos ya que existen pagos registrados`
+    //                         });
+    //                     }
+    //                     // ITBMS
+    //                     if (pedidoDB.itbms === true) {
+    //                         totalProductoPedido = parseFloat(productoPedidoInhabilitado.total.toFixed(2));
+    //                         itbmsProductoPedido = parseFloat((totalProductoPedido * 0.07).toFixed(2));
+    //                         itbmsPedido = parseFloat((pedidoDB.monto_itbms - itbmsProductoPedido).toFixed(2));
+    //                         subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoInhabilitado.total).toFixed(2));
+    //                         totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
+    //                     } else if (pedidoDB.itbms === false) {
+    //                         subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoInhabilitado.total).toFixed(2));
+    //                         totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
+    //                     }
+    //                     // Object.assign(query, { $pull: { productos_pedidos: id }, subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
+    //                     Object.assign(query, { subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
+    //                     pedidoModel.findByIdAndUpdate(pedido, query, { new: true })
+    //                         .exec(async (err: CallbackError, pedidoActualizadoDB: any) => {
+    //                             if (err) {
+    //                                 return resp.json({
+    //                                     ok: false,
+    //                                     mensaje: `Error interno`,
+    //                                     err
+    //                                 });
+    //                             }
+    //                             const bitacora = new BitacoraClass();
+    //                             await bitacora.crearBitacora(req, 'Se inhabilitó un producto', pedidoDB._id);
+    //                             return resp.json({
+    //                                 ok: true,
+    //                                 pedidoActualizadoDB
+    //                             });
+    //                         });
+    //                 });
+    //         });
+    //     });
+    // }
     ingresarProductoPedido(req, resp, idProducto, cantidad, existeProductoPedido, idPedido, pedidoDB, precio) {
         const totalProductoPedido = cantidad * precio;
         let subtotalPedido = 0;
@@ -377,7 +376,8 @@ class ProductoPedido {
                 precio: precio,
                 producto: idProducto,
                 pedido: idPedido,
-                total: totalProductoPedido
+                total: totalProductoPedido,
+                // falta descripcion
             });
             nuevoProductoPedido.save((err, productoPedidoDB) => __awaiter(this, void 0, void 0, function* () {
                 if (err) {
@@ -387,53 +387,51 @@ class ProductoPedido {
                         err
                     });
                 }
-                // Si existe itbms
-                if (pedidoDB.itbms === true) {
-                    itbmsProductoPedido = parseFloat((totalProductoPedido * 0.07).toFixed(2));
-                    itbmsPedido = parseFloat(itbmsProductoPedido.toFixed(2));
-                }
-                if (existeProductoPedido === false) { // Primer producto pedido 
-                    subtotalPedido = parseFloat(totalProductoPedido.toFixed(2));
-                    itbmsPedido = parseFloat(pedidoDB.monto_itbms.toFixed(2)) + parseFloat(itbmsPedido.toFixed(2));
-                    totalPedido = subtotalPedido + itbmsPedido;
-                }
-                else { // Existen más productos pedidos
-                    // totales
-                    const mapPrecios = pedidoDB.productos_pedidos.map((productoPedido) => {
-                        // return productoPedido.total;
-                        if (productoPedido.inhabilitado === true) {
-                            return 0;
-                        }
-                        else if (productoPedido.inhabilitado === false) {
-                            return productoPedido.total;
-                        }
-                    });
-                    const totalPrecios = mapPrecios.reduce((acc, current) => {
-                        return acc + current;
-                    });
-                    // pagos
-                    const mapPagos = pedidoDB.pagos_pedido.map((pagoPedido) => {
-                        return pagoPedido.monto;
-                    });
-                    let totalPagos = 0;
-                    if (pedidoDB.pagos_pedido.length === 0) { // No hay pagos aún
-                        totalPagos = 0;
-                    }
-                    else {
-                        totalPagos = mapPagos.reduce((acc, current) => {
-                            return acc + current;
-                        });
-                    }
-                    subtotalPedido = parseFloat(totalPrecios.toFixed(2)) + parseFloat(totalProductoPedido.toFixed(2));
-                    itbmsPedido = parseFloat(pedidoDB.monto_itbms.toFixed(2)) + parseFloat(itbmsProductoPedido.toFixed(2));
-                    totalPedido = (subtotalPedido + itbmsPedido) - parseFloat(totalPagos.toFixed(2));
-                }
-                // return;
-                Object.assign(query, { $push: { productos_pedidos: productoPedidoDB._id }, subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
+                // // Si existe itbms
+                // if (pedidoDB.itbms === true) {
+                //     itbmsProductoPedido = parseFloat((totalProductoPedido * 0.07).toFixed(2));
+                //     itbmsPedido = parseFloat(itbmsProductoPedido.toFixed(2));
+                // }
+                // if (existeProductoPedido === false) { // Primer producto pedido 
+                //     subtotalPedido = parseFloat(totalProductoPedido.toFixed(2));
+                //     itbmsPedido = parseFloat(pedidoDB.monto_itbms.toFixed(2)) + parseFloat(itbmsPedido.toFixed(2));
+                //     totalPedido = subtotalPedido + itbmsPedido;
+                // } else { // Existen más productos pedidos
+                //     // totales
+                //     const mapPrecios: Array<any> = pedidoDB.productos_pedidos.map((productoPedido: ProductoPedidoInterface) => {
+                //         // return productoPedido.total;
+                //         if (productoPedido.inhabilitado === true) {
+                //             return 0;
+                //         } else if (productoPedido.inhabilitado === false) {
+                //             return productoPedido.total;
+                //         }
+                //     });
+                //     const totalPrecios: number = mapPrecios.reduce((acc: number, current: number) => {
+                //         return acc + current;
+                //     });
+                //     // pagos
+                //     const mapPagos: Array<number> = pedidoDB.pagos_pedido.map((pagoPedido: any) => {
+                //         return pagoPedido.monto;
+                //     });
+                //     let totalPagos: number = 0;
+                //     if (pedidoDB.pagos_pedido.length === 0) { // No hay pagos aún
+                //         totalPagos = 0;
+                //     } else {
+                //         totalPagos = mapPagos.reduce((acc: number, current: number) => {
+                //             return acc + current;
+                //         });
+                //     }
+                //     subtotalPedido = parseFloat(totalPrecios.toFixed(2)) + parseFloat(totalProductoPedido.toFixed(2));
+                //     itbmsPedido = parseFloat(pedidoDB.monto_itbms.toFixed(2)) + parseFloat(itbmsProductoPedido.toFixed(2));
+                //     totalPedido = (subtotalPedido + itbmsPedido) - parseFloat(totalPagos.toFixed(2));
+                // }
+                // // return;
+                // Object.assign(query, { $push: { productos_pedidos: productoPedidoDB._id }, subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
+                Object.assign(query, { $push: { productos_pedidos: productoPedidoDB._id } });
                 // return;
                 // Actualizar el pedido
                 pedidoModel_1.default.findByIdAndUpdate(idPedido, query, { new: true })
-                    .populate({ path: 'productos_pedidos', populate: 'producto' })
+                    .populate([{ path: 'productos_pedidos', model: 'pedidos', populate: { path: 'producto', model: 'products' } }])
                     .exec((err, pedidoActualizadoDB) => __awaiter(this, void 0, void 0, function* () {
                     if (err) {
                         return resp.json({
