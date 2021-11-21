@@ -184,7 +184,7 @@ class Product {
         // const estado: boolean = castEstado(estadoHeader);
         const criterioNombre = req.get('criterioNombre');
         // /^[a-zA-ZáéíóúÁÉÍÓU]+$/
-        productModel_1.default.find({ nombre: { $regex: criterioNombre, $options: 'i' } }, (err, productoDB) => {
+        productModel_1.default.find({ nombre: { $regex: criterioNombre, $options: 'i' } }, (err, productosDB) => {
             if (err) {
                 return res.json({
                     ok: false,
@@ -192,16 +192,16 @@ class Product {
                     err
                 });
             }
-            if (!productoDB || productoDB.length === 0) {
+            if (!productosDB || productosDB.length === 0) {
                 return res.json({
                     ok: false,
                     mensaje: `No existen productos con ese criterio de búsqueda`,
-                    productoDB
+                    productosDB
                 });
             }
             return res.json({
                 ok: true,
-                productoDB
+                productosDB
             });
         });
     }

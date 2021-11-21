@@ -7,7 +7,7 @@ import { ProductoPedidoInterface } from '../interfaces/pedidos';
 const Schema = mongoose.Schema;
 
 const productoPedidoSchema = new Schema({
-    cantidad: { type: Number, default: 0 },
+    cantidad: { type: Number, default: 1 },
     precio: { type: Number, default: 0 },
     comentario: { type: String, default: 'Ninguno' },
     total: { type: Number, default: 0 },

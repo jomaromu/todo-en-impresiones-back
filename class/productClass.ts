@@ -230,7 +230,7 @@ export class Product {
         const criterioNombre = req.get('criterioNombre');
         // /^[a-zA-ZáéíóúÁÉÍÓU]+$/
 
-        productModel.find({ nombre: { $regex: criterioNombre, $options: 'i' } }, (err: CallbackError, productoDB: Array<ProductModelInterface>) => { //  estado: estado 
+        productModel.find({ nombre: { $regex: criterioNombre, $options: 'i' } }, (err: CallbackError, productosDB: Array<ProductModelInterface>) => { //  estado: estado 
 
             if (err) {
                 return res.json({
@@ -241,18 +241,18 @@ export class Product {
 
             }
 
-            if (!productoDB || productoDB.length === 0) {
+            if (!productosDB || productosDB.length === 0) {
 
                 return res.json({
                     ok: false,
                     mensaje: `No existen productos con ese criterio de búsqueda`,
-                    productoDB
+                    productosDB
                 })
             }
 
             return res.json({
                 ok: true,
-                productoDB
+                productosDB
             });
 
         });

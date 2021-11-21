@@ -249,40 +249,43 @@ export class ProductoPedido {
                         }
 
                         // Existen pagos
-                        if (pedidoDB.pagos_pedido.length > 0) {
-                            return resp.json({
-                                ok: false,
-                                mensaje: `No pueden eliminar productos ya que existen pagos registrados`
-                            });
-                        }
+                        // if (pedidoDB.pagos_pedido.length > 0) {
+                        //     return resp.json({
+                        //         ok: false,
+                        //         mensaje: `No pueden eliminar productos ya que existen pagos registrados`
+                        //     });
+                        // }
 
-                        if (productoPedidoBorrado.inhabilitado === true) {
+                        // if (productoPedidoBorrado.inhabilitado === true) {
 
-                            Object.assign(query, { $pull: { productos_pedidos: id } });
+                        //     Object.assign(query, { $pull: { productos_pedidos: id } });
 
-                        } else if (productoPedidoBorrado.inhabilitado === false) {
+                        // } else if (productoPedidoBorrado.inhabilitado === false) {
 
-                            // ITBMS
-                            if (pedidoDB.itbms === true) {
+                        //     // ITBMS
+                        //     if (pedidoDB.itbms === true) {
 
-                                totalProductoPedido = parseFloat(productoPedidoBorrado.total.toFixed(2));
-                                itbmsProductoPedido = parseFloat((totalProductoPedido * 0.07).toFixed(2));
+                        //         totalProductoPedido = parseFloat(productoPedidoBorrado.total.toFixed(2));
+                        //         itbmsProductoPedido = parseFloat((totalProductoPedido * 0.07).toFixed(2));
 
-                                itbmsPedido = parseFloat((pedidoDB.monto_itbms - itbmsProductoPedido).toFixed(2));
-                                subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoBorrado.total).toFixed(2));
-                                totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
+                        //         itbmsPedido = parseFloat((pedidoDB.monto_itbms - itbmsProductoPedido).toFixed(2));
+                        //         subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoBorrado.total).toFixed(2));
+                        //         totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
 
-                            } else if (pedidoDB.itbms === false) {
+                        //     } else if (pedidoDB.itbms === false) {
 
-                                subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoBorrado.total).toFixed(2));
-                                totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
-                            }
+                        //         subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoBorrado.total).toFixed(2));
+                        //         totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
+                        //     }
 
-                            Object.assign(query, { $pull: { productos_pedidos: id }, subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
-                        }
+                        //     Object.assign(query, { $pull: { productos_pedidos: id }, subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
+                        // }
 
-                        pedidoModel.findByIdAndUpdate(pedido, query, { new: true })
-                            .exec(async (err: CallbackError, pedidoActualizadoDB: any) => {
+                        // Object.assign(query, { $pull: { productos_pedidos: id }, subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
+
+
+                        pedidoModel.findByIdAndUpdate(pedido, { $pull: { productos_pedidos: id } }, { new: true })
+                            .exec(async (err: CallbackError, pedidoDB: any) => {
 
                                 if (err) {
                                     return resp.json({
@@ -297,7 +300,7 @@ export class ProductoPedido {
 
                                 return resp.json({
                                     ok: true,
-                                    pedidoActualizadoDB
+                                    pedidoDB
                                 });
                             });
                     });
@@ -426,6 +429,9 @@ export class ProductoPedido {
     ingresarProductoPedido(req: any, resp: Response, idProducto: any, cantidad: number, existeProductoPedido: boolean, idPedido: any, pedidoDB: PedidoModelInterface, precio: number): any {
 
         const totalProductoPedido = cantidad * precio;
+        const comentario = req.body.comentario;
+        const itbms = req.body.itbms;
+
         let subtotalPedido: number = 0;
         let itbmsPedido: number = 0;
         let totalPedido: number = 0;
@@ -473,7 +479,7 @@ export class ProductoPedido {
                 producto: idProducto,
                 pedido: idPedido,
                 total: totalProductoPedido,
-                // falta descripcion
+                comentario: comentario
             });
 
             nuevoProductoPedido.save(async (err: CallbackError, productoPedidoDB: ProductoPedidoInterface) => {
@@ -547,7 +553,7 @@ export class ProductoPedido {
                 // Actualizar el pedido
                 pedidoModel.findByIdAndUpdate(idPedido, query, { new: true })
                     .populate([{ path: 'productos_pedidos', model: 'pedidos', populate: { path: 'producto', model: 'products' } }])
-                    .exec(async (err: CallbackError, pedidoActualizadoDB: any) => {
+                    .exec(async (err: CallbackError, pedidoDB: any) => {
 
                         if (err) {
                             return resp.json({
@@ -562,7 +568,7 @@ export class ProductoPedido {
 
                         return resp.json({
                             ok: true,
-                            pedidoActualizadoDB
+                            pedidoDB
                         });
                     });
             });

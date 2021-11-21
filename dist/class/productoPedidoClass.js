@@ -202,32 +202,31 @@ class ProductoPedido {
                         });
                     }
                     // Existen pagos
-                    if (pedidoDB.pagos_pedido.length > 0) {
-                        return resp.json({
-                            ok: false,
-                            mensaje: `No pueden eliminar productos ya que existen pagos registrados`
-                        });
-                    }
-                    if (productoPedidoBorrado.inhabilitado === true) {
-                        Object.assign(query, { $pull: { productos_pedidos: id } });
-                    }
-                    else if (productoPedidoBorrado.inhabilitado === false) {
-                        // ITBMS
-                        if (pedidoDB.itbms === true) {
-                            totalProductoPedido = parseFloat(productoPedidoBorrado.total.toFixed(2));
-                            itbmsProductoPedido = parseFloat((totalProductoPedido * 0.07).toFixed(2));
-                            itbmsPedido = parseFloat((pedidoDB.monto_itbms - itbmsProductoPedido).toFixed(2));
-                            subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoBorrado.total).toFixed(2));
-                            totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
-                        }
-                        else if (pedidoDB.itbms === false) {
-                            subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoBorrado.total).toFixed(2));
-                            totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
-                        }
-                        Object.assign(query, { $pull: { productos_pedidos: id }, subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
-                    }
-                    pedidoModel_1.default.findByIdAndUpdate(pedido, query, { new: true })
-                        .exec((err, pedidoActualizadoDB) => __awaiter(this, void 0, void 0, function* () {
+                    // if (pedidoDB.pagos_pedido.length > 0) {
+                    //     return resp.json({
+                    //         ok: false,
+                    //         mensaje: `No pueden eliminar productos ya que existen pagos registrados`
+                    //     });
+                    // }
+                    // if (productoPedidoBorrado.inhabilitado === true) {
+                    //     Object.assign(query, { $pull: { productos_pedidos: id } });
+                    // } else if (productoPedidoBorrado.inhabilitado === false) {
+                    //     // ITBMS
+                    //     if (pedidoDB.itbms === true) {
+                    //         totalProductoPedido = parseFloat(productoPedidoBorrado.total.toFixed(2));
+                    //         itbmsProductoPedido = parseFloat((totalProductoPedido * 0.07).toFixed(2));
+                    //         itbmsPedido = parseFloat((pedidoDB.monto_itbms - itbmsProductoPedido).toFixed(2));
+                    //         subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoBorrado.total).toFixed(2));
+                    //         totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
+                    //     } else if (pedidoDB.itbms === false) {
+                    //         subtotalPedido = parseFloat((pedidoDB.subtotal - productoPedidoBorrado.total).toFixed(2));
+                    //         totalPedido = parseFloat((subtotalPedido + itbmsPedido).toFixed(2));
+                    //     }
+                    //     Object.assign(query, { $pull: { productos_pedidos: id }, subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
+                    // }
+                    // Object.assign(query, { $pull: { productos_pedidos: id }, subtotal: subtotalPedido, monto_itbms: itbmsPedido, total: totalPedido });
+                    pedidoModel_1.default.findByIdAndUpdate(pedido, { $pull: { productos_pedidos: id } }, { new: true })
+                        .exec((err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
                         if (err) {
                             return resp.json({
                                 ok: false,
@@ -239,7 +238,7 @@ class ProductoPedido {
                         yield bitacora.crearBitacora(req, 'Eliminó un producto', pedidoDB._id);
                         return resp.json({
                             ok: true,
-                            pedidoActualizadoDB
+                            pedidoDB
                         });
                     }));
                 });
@@ -340,6 +339,8 @@ class ProductoPedido {
     // }
     ingresarProductoPedido(req, resp, idProducto, cantidad, existeProductoPedido, idPedido, pedidoDB, precio) {
         const totalProductoPedido = cantidad * precio;
+        const comentario = req.body.comentario;
+        const itbms = req.body.itbms;
         let subtotalPedido = 0;
         let itbmsPedido = 0;
         let totalPedido = 0;
@@ -377,7 +378,7 @@ class ProductoPedido {
                 producto: idProducto,
                 pedido: idPedido,
                 total: totalProductoPedido,
-                // falta descripcion
+                comentario: comentario
             });
             nuevoProductoPedido.save((err, productoPedidoDB) => __awaiter(this, void 0, void 0, function* () {
                 if (err) {
@@ -432,7 +433,7 @@ class ProductoPedido {
                 // Actualizar el pedido
                 pedidoModel_1.default.findByIdAndUpdate(idPedido, query, { new: true })
                     .populate([{ path: 'productos_pedidos', model: 'pedidos', populate: { path: 'producto', model: 'products' } }])
-                    .exec((err, pedidoActualizadoDB) => __awaiter(this, void 0, void 0, function* () {
+                    .exec((err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
                     if (err) {
                         return resp.json({
                             ok: false,
@@ -444,7 +445,7 @@ class ProductoPedido {
                     yield bitacora.crearBitacora(req, 'Agregó un producto', pedidoDB._id);
                     return resp.json({
                         ok: true,
-                        pedidoActualizadoDB
+                        pedidoDB
                     });
                 }));
             }));

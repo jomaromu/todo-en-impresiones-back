@@ -6,7 +6,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 // Crear esquema
 const Schema = mongoose_1.default.Schema;
 const productoPedidoSchema = new Schema({
-    cantidad: { type: Number, default: 0 },
+    cantidad: { type: Number, default: 1 },
     precio: { type: Number, default: 0 },
     comentario: { type: String, default: 'Ninguno' },
     total: { type: Number, default: 0 },

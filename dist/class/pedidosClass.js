@@ -122,6 +122,7 @@ class PedidosClass {
                 // .populate('prioridad_pedido')
                 .populate('asignado_a')
                 .populate('origen_pedido')
+                .populate('productos_pedidos')
                 .exec();
             // if (pedidoDB.productos_pedidos.length <= 0) {
             //     return resp.json({
@@ -194,7 +195,8 @@ class PedidosClass {
                 // .populate('prioridad_pedido')
                 .populate('asignado_a')
                 .populate('origen_pedido')
-                .exec((err, pedidosDB) => __awaiter(this, void 0, void 0, function* () {
+                .populate('productos_pedidos')
+                .exec((err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
                 if (err) {
                     return resp.json({
                         ok: false,
@@ -203,24 +205,24 @@ class PedidosClass {
                     });
                 }
                 if (query.sucursal) {
-                    yield bitacora.crearBitacora(req, `Cambió sucursal del pedido a ${pedidosDB.sucursal.nombre}`, pedidoDB._id);
+                    yield bitacora.crearBitacora(req, `Cambió sucursal del pedido a ${pedidoDB.sucursal.nombre}`, pedidoDB._id);
                 }
                 if (query.etapa_pedido) {
-                    yield bitacora.crearBitacora(req, `Cambió etapa del pedido a ${pedidosDB.etapa_pedido.nombre}`, pedidoDB._id);
+                    yield bitacora.crearBitacora(req, `Cambió etapa del pedido a ${pedidoDB.etapa_pedido.nombre}`, pedidoDB._id);
                 }
                 if (query.prioridad_pedido) {
-                    yield bitacora.crearBitacora(req, `Cambió la prioridad del pedido a ${pedidosDB.prioridad_pedido.nombre}`, pedidoDB._id);
+                    yield bitacora.crearBitacora(req, `Cambió la prioridad del pedido a ${pedidoDB.prioridad_pedido.nombre}`, pedidoDB._id);
                 }
                 if (query.asignado_a) {
-                    yield bitacora.crearBitacora(req, `Asginó el pedido a ${pedidosDB.asignado_a.nombre}`, pedidoDB._id);
+                    yield bitacora.crearBitacora(req, `Asginó el pedido a ${pedidoDB.asignado_a.nombre}`, pedidoDB._id);
                 }
                 if (query.estado_pedido) {
-                    yield bitacora.crearBitacora(req, `Cambió el estado del pedido a ${pedidosDB.estado_pedido}`, pedidoDB._id);
+                    yield bitacora.crearBitacora(req, `Cambió el estado del pedido a ${pedidoDB.estado_pedido}`, pedidoDB._id);
                 }
                 return resp.json({
                     ok: true,
                     mensaje: 'Pedido actualizado',
-                    pedidosDB,
+                    pedidoDB,
                     // pedidoDB: pedidoDB
                 });
             }));
