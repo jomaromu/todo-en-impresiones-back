@@ -296,7 +296,7 @@ export class ProductoPedido {
                                 }
 
                                 const bitacora = new BitacoraClass();
-                                await bitacora.crearBitacora(req, 'Eliminó un producto', pedidoDB._id);
+                                await bitacora.crearBitacora(req, 'Eliminó un producto pedido', pedidoDB._id);
 
                                 return resp.json({
                                     ok: true,

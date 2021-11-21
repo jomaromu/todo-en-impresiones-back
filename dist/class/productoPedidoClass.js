@@ -235,7 +235,7 @@ class ProductoPedido {
                             });
                         }
                         const bitacora = new bitacoraClass_1.BitacoraClass();
-                        yield bitacora.crearBitacora(req, 'Eliminó un producto', pedidoDB._id);
+                        yield bitacora.crearBitacora(req, 'Eliminó un producto pedido', pedidoDB._id);
                         return resp.json({
                             ok: true,
                             pedidoDB
