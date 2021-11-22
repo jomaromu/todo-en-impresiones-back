@@ -20,6 +20,10 @@ pedidoRouter.delete('/eliminarPedidoID', [auth_1.verificaToken], (req, resp) => 
     const eliminarPedidoID = new pedidosClass_1.PedidosClass();
     eliminarPedidoID.eliminarPedidoID(req, resp);
 });
+pedidoRouter.get('/obtenerPedidosCriterio', [auth_1.verificaToken], (req, resp) => {
+    const obtenerPedidosCriterio = new pedidosClass_1.PedidosClass();
+    obtenerPedidosCriterio.obtenerPedidosCriterio(req, resp);
+});
 pedidoRouter.get('/obtenerTodos', [auth_1.verificaToken], (req, resp) => {
     const obtenerTodos = new pedidosClass_1.PedidosClass();
     obtenerTodos.obtenerTodos(req, resp);

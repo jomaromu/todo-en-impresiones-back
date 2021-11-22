@@ -285,6 +285,42 @@ class PedidosClass {
             });
         }));
     }
+    obtenerPedidosCriterio(req, resp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const id = req.get('criterio');
+            const nombreCliente = req.get('criterio');
+            const telefono = req.get('criterio');
+            const diseniador = req.get('criterio');
+            pedidoModel_1.default.find({ $or: [{ idReferencia: id }, { 'cliente.nombre': nombreCliente }, { 'cliente.telefono': telefono }] })
+                .populate('cliente')
+                .exec((err, pedidosDB) => {
+                if (err) {
+                    return resp.json({
+                        ok: false,
+                        mensaje: `Error interno`,
+                        err
+                    });
+                }
+                return resp.json({
+                    ok: true,
+                    pedidosDB: pedidosDB,
+                    cantidad: pedidosDB.length
+                });
+            });
+            // if (!pedidosDB || pedidosDB.length === 0) {
+            //     return resp.json({
+            //         ok: false,
+            //         mensaje: `No se encontraron pedidos`
+            //     });
+            // } else {
+            //     return resp.json({
+            //         ok: true,
+            //         pedidosDB: pedidosDB,
+            //         cantidad: pedidosDB.length
+            //     });
+            // }
+        });
+    }
     obtenerTodos(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {
             // const estadoHeader: string = req.get('estado');
