@@ -350,49 +350,49 @@ export class PedidosClass {
             });
     }
 
-    async obtenerPedidosCriterio(req: any, resp: Response): Promise<any> {
+    // async obtenerPedidosCriterio(req: any, resp: Response): Promise<any> {
 
-        const id = req.get('criterio');
-        const nombreCliente = req.get('criterio');
-        const telefono = req.get('criterio');
-        const diseniador = req.get('criterio');
+    //     const id = req.get('criterio');
+    //     const nombreCliente = req.get('criterio');
+    //     const telefono = req.get('criterio');
+    //     const diseniador = req.get('criterio');
 
 
-        pedidoModel.find({ $or: [{ idReferencia: id }, { 'cliente.nombre': nombreCliente }, { 'cliente.telefono': telefono }] })
-            .populate('cliente')
-            .exec((err: any, pedidosDB: Array<any>) => {
+    //     pedidoModel.find({ $or: [{ idReferencia: id }, { 'cliente.nombre': nombreCliente }, { 'cliente.telefono': telefono }] })
+    //         .populate('cliente')
+    //         .exec((err: any, pedidosDB: Array<any>) => {
 
-                if (err) {
-                    return resp.json({
-                        ok: false,
-                        mensaje: `Error interno`,
-                        err
-                    });
-                }
+    //             if (err) {
+    //                 return resp.json({
+    //                     ok: false,
+    //                     mensaje: `Error interno`,
+    //                     err
+    //                 });
+    //             }
 
-                return resp.json({
-                    ok: true,
-                    pedidosDB: pedidosDB,
-                    cantidad: pedidosDB.length
-                });
-            });
+    //             return resp.json({
+    //                 ok: true,
+    //                 pedidosDB: pedidosDB,
+    //                 cantidad: pedidosDB.length
+    //             });
+    //         });
 
-        // if (!pedidosDB || pedidosDB.length === 0) {
+    //     // if (!pedidosDB || pedidosDB.length === 0) {
 
-        //     return resp.json({
-        //         ok: false,
-        //         mensaje: `No se encontraron pedidos`
-        //     });
+    //     //     return resp.json({
+    //     //         ok: false,
+    //     //         mensaje: `No se encontraron pedidos`
+    //     //     });
 
-        // } else {
-        //     return resp.json({
-        //         ok: true,
-        //         pedidosDB: pedidosDB,
-        //         cantidad: pedidosDB.length
-        //     });
-        // }
+    //     // } else {
+    //     //     return resp.json({
+    //     //         ok: true,
+    //     //         pedidosDB: pedidosDB,
+    //     //         cantidad: pedidosDB.length
+    //     //     });
+    //     // }
 
-    }
+    // }
 
     async obtenerTodos(req: any, resp: Response): Promise<any> {
 

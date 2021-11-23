@@ -30,11 +30,11 @@ pedidoRouter.delete('/eliminarPedidoID', [verificaToken], (req: Request, resp: R
     eliminarPedidoID.eliminarPedidoID(req, resp);
 });
 
-pedidoRouter.get('/obtenerPedidosCriterio', [verificaToken], (req: Request, resp: Response) => {
+// pedidoRouter.get('/obtenerPedidosCriterio', [verificaToken], (req: Request, resp: Response) => {
 
-    const obtenerPedidosCriterio = new PedidosClass();
-    obtenerPedidosCriterio.obtenerPedidosCriterio(req, resp);
-});
+//     const obtenerPedidosCriterio = new PedidosClass();
+//     obtenerPedidosCriterio.obtenerPedidosCriterio(req, resp);
+// });
 
 pedidoRouter.get('/obtenerTodos', [verificaToken], (req: Request, resp: Response) => {
 
