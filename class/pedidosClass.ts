@@ -27,7 +27,7 @@ export class PedidosClass {
 
     constructor() {
         // this.idRef = nanoid(10);
-        this.idRef = customAlphabet('1234567890', 9);
+        this.idRef = customAlphabet('1234567890', 7);
     }
 
     crearPedido(req: any, resp: Response): void {

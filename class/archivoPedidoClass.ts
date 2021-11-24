@@ -35,6 +35,9 @@ export class ArchivoClass {
         const idCreador = req.usuario._id;
         const files: UploadedFile = req.files;
         const tipo = req.body.tipo;
+        // const nombre = req.body.nombre;
+
+        console.log(req.files);
 
         const respArch: RespPromise = await extraerArchivo(files);
 

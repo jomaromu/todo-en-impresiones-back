@@ -34,6 +34,8 @@ class ArchivoClass {
             const idCreador = req.usuario._id;
             const files = req.files;
             const tipo = req.body.tipo;
+            // const nombre = req.body.nombre;
+            console.log(req.files);
             const respArch = yield (0, archivos_1.extraerArchivo)(files);
             if (respArch.ok === false) {
                 return resp.json({

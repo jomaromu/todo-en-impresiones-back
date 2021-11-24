@@ -29,7 +29,7 @@ class PedidosClass {
     constructor() {
         this.pathIds = `pedidosIDs.json`;
         // this.idRef = nanoid(10);
-        this.idRef = (0, nanoid_1.customAlphabet)('1234567890', 9);
+        this.idRef = (0, nanoid_1.customAlphabet)('1234567890', 7);
     }
     crearPedido(req, resp) {
         const idCreador = req.usuario._id;

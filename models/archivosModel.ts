@@ -19,7 +19,7 @@ const archivoSchema = new Schema({
     nombre_archivo: { type: String },
     pedido: { type: String },
     fecha: { type: String },
-    tipo: { type: String, enum: tipos, default: 'original' },
+    tipo: { type: Number, default: 0 }, // Normal, Corregir, Aprobados
     estado: { type: Boolean, default: true }
 });
 
