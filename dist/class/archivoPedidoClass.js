@@ -35,7 +35,6 @@ class ArchivoClass {
             const files = req.files;
             const tipo = req.body.tipo;
             // const nombre = req.body.nombre;
-            console.log(req.files);
             const respArch = yield (0, archivos_1.extraerArchivo)(files);
             if (respArch.ok === false) {
                 return resp.json({
@@ -103,7 +102,7 @@ class ArchivoClass {
                                         mensaje: `Debe agregar un producto para poder crear archivos`
                                     });
                                 }
-                                pedidoModel_1.default.findByIdAndUpdate(pedido, { $push: { archivos: archivoDB._id } }, { new: true }, (err, pedidoActualizadoDB) => __awaiter(this, void 0, void 0, function* () {
+                                pedidoModel_1.default.findByIdAndUpdate(pedido, { $push: { archivos: archivoDB._id } }, { new: true }, (err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
                                     if (err) {
                                         (0, archivos_1.eliminarArchivo)(nombre_archivo);
                                         yield archivosModel_1.default.findByIdAndDelete(archivoDB._id);
@@ -113,7 +112,7 @@ class ArchivoClass {
                                             err
                                         });
                                     }
-                                    if (!pedidoActualizadoDB) {
+                                    if (!pedidoDB) {
                                         (0, archivos_1.eliminarArchivo)(nombre_archivo);
                                         yield archivosModel_1.default.findByIdAndDelete(archivoDB._id);
                                         return resp.json({
@@ -125,7 +124,8 @@ class ArchivoClass {
                                     const respGestor = yield gestorCarpeta.checkSize();
                                     return resp.json({
                                         ok: true,
-                                        pedidoActualizadoDB,
+                                        mensaje: 'Archivo subido',
+                                        pedidoDB,
                                         archivoDB,
                                         carpeta: respGestor
                                     });

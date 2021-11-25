@@ -16,7 +16,7 @@ const archivoSchema = new Schema({
 
     idReferencia: { type: String, required: [true, 'Es necesario el ID Referencia'], unique: true }, // ID Directo
     idCreador: { type: Schema.Types.ObjectId, ref: 'userWorker', required: [true, 'Es necesario el ID del creador'] },
-    nombre_archivo: { type: String },
+    nombre_archivo: { type: String, default: 'archivo' },
     pedido: { type: String },
     fecha: { type: String },
     tipo: { type: Number, default: 0 }, // Normal, Corregir, Aprobados

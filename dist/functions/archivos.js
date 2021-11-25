@@ -47,8 +47,10 @@ const extraerArchivo = (files) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.extraerArchivo = extraerArchivo;
 const verificaMime = (file, resolve, reject, objArchivo) => {
-    const mime = file.mimetype;
-    if (mime !== 'image/jpeg' && mime !== 'application/pdf') {
+    // const mime = file.mimetype;
+    const arrayMime = file.mimetype.split('/');
+    const mime = arrayMime[arrayMime.length - 1];
+    if (mime !== 'png' && mime !== 'jpeg' && mime !== 'svg' && mime !== 'tif' && mime !== 'tiff' && mime !== 'jpg' && mime !== 'ppt' && mime !== 'pdf') {
         objArchivo.ok = false;
         objArchivo.mensaje = `El archivo no parece ser una imágen válida`;
         resolve(objArchivo);

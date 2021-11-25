@@ -37,8 +37,6 @@ export class ArchivoClass {
         const tipo = req.body.tipo;
         // const nombre = req.body.nombre;
 
-        console.log(req.files);
-
         const respArch: RespPromise = await extraerArchivo(files);
 
         if (respArch.ok === false) {
@@ -129,7 +127,7 @@ export class ArchivoClass {
                                 });
                             }
 
-                            pedidoModel.findByIdAndUpdate(pedido, { $push: { archivos: archivoDB._id } }, { new: true }, async (err: CallbackError, pedidoActualizadoDB: any) => {
+                            pedidoModel.findByIdAndUpdate(pedido, { $push: { archivos: archivoDB._id } }, { new: true }, async (err: CallbackError, pedidoDB: any) => {
 
                                 if (err) {
                                     eliminarArchivo(nombre_archivo);
@@ -142,7 +140,7 @@ export class ArchivoClass {
                                     });
                                 }
 
-                                if (!pedidoActualizadoDB) {
+                                if (!pedidoDB) {
                                     eliminarArchivo(nombre_archivo);
                                     await archivosModel.findByIdAndDelete(archivoDB._id);
 
@@ -157,7 +155,8 @@ export class ArchivoClass {
 
                                 return resp.json({
                                     ok: true,
-                                    pedidoActualizadoDB,
+                                    mensaje: 'Archivo subido',
+                                    pedidoDB,
                                     archivoDB,
                                     carpeta: respGestor
                                 });

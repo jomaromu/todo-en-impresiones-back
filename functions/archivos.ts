@@ -48,9 +48,11 @@ const extraerArchivo = async (files: UploadedFile | any): Promise<any> => {
 
 const verificaMime = (file: UploadedFile, resolve: any, reject: any, objArchivo: RespPromise) => {
 
-    const mime = file.mimetype;
+    // const mime = file.mimetype;
+    const arrayMime = file.mimetype.split('/');
+    const mime = arrayMime[arrayMime.length - 1];
 
-    if (mime !== 'image/jpeg' && mime !== 'application/pdf') {
+    if (mime !== 'png' && mime !== 'jpeg' && mime !== 'svg' && mime !== 'tif' && mime !== 'tiff' && mime !== 'jpg' && mime !== 'ppt' && mime !== 'pdf') {
 
         objArchivo.ok = false;
         objArchivo.mensaje = `El archivo no parece ser una imágen válida`;
