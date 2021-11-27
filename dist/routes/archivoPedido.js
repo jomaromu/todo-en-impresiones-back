@@ -1,8 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const archivoPedidoClass_1 = require("../class/archivoPedidoClass");
 const auth_1 = require("../auth/auth");
+const path_1 = __importDefault(require("path"));
 // instanciar el Router
 const archivoRouter = (0, express_1.Router)();
 // ==================================================================== //
@@ -25,6 +29,13 @@ archivoRouter.get('/obtenerArchivo', [auth_1.verificaToken], (req, resp) => {
 archivoRouter.get('/obtenerTodosArchivos', [auth_1.verificaToken], (req, resp) => {
     const obtenerTodosArchivos = new archivoPedidoClass_1.ArchivoClass();
     obtenerTodosArchivos.obtenerTodosArchivos(req, resp);
+});
+// ==================================================================== //
+// Obtener archivos por pedido
+// ==================================================================== //
+archivoRouter.get('/obtenerArchivosPorPedido', [auth_1.verificaToken], (req, resp) => {
+    const obtenerArchivosPorPedido = new archivoPedidoClass_1.ArchivoClass();
+    obtenerArchivosPorPedido.obtenerArchivosPorPedido(req, resp);
 });
 // ==================================================================== //
 // Obtener archivos aprobados
@@ -60,5 +71,14 @@ archivoRouter.delete('/eliminarArhivoID', [auth_1.verificaToken], (req, resp) =>
 archivoRouter.delete('/eliminarArchivoRangoFechas', [auth_1.verificaToken, auth_1.eliminarArchivo], (req, resp) => {
     const eliminarArchivoRangoFechas = new archivoPedidoClass_1.ArchivoClass();
     eliminarArchivoRangoFechas.eliminarArchivoRangoFechas(req, resp);
+});
+// ==================================================================== //
+// Enviar archivo
+// ==================================================================== //
+archivoRouter.get('/enviarArchivo', (req, resp) => {
+    const nombreArchivo = req.query.nombreArchivo;
+    // dist/uploads/archivos/null-3216.jpg
+    const pathFile = path_1.default.resolve(__dirname, `../uploads/archivos/${nombreArchivo}`);
+    return resp.sendFile(pathFile);
 });
 exports.default = archivoRouter;

@@ -362,7 +362,7 @@ const editarPedido = (req: any, resp: Response, next: NextFunction) => {
 
     const roleColaborador = req.usuario.colaborador_role;
     const id = req.get('id');
-    console.log(roleColaborador);
+    // console.log(roleColaborador);
 
     pedidoModel.findById(id, (err: CallbackError, pedidoDB: PedidoModelInterface) => {
 

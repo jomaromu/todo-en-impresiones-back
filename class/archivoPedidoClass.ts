@@ -20,6 +20,7 @@ import { ArchivosInterface, PedidoModelInterface } from '../interfaces/pedidos';
 // Funciones externas
 import { eliminarArchivo, extraerArchivo, subirArchivo } from '../functions/archivos';
 import { castEstado } from '../functions/castEstado';
+import Server from './server';
 
 export class ArchivoClass {
 
@@ -153,6 +154,9 @@ export class ArchivoClass {
                                 const gestorCarpeta = new GestorCarpetaClass();
                                 const respGestor = await gestorCarpeta.checkSize();
 
+                                const server = Server.instance;
+                                server.io.emit('recibir-archivos');
+
                                 return resp.json({
                                     ok: true,
                                     mensaje: 'Archivo subido',
@@ -200,25 +204,53 @@ export class ArchivoClass {
 
     obtenerTodosArchivos(req: any, resp: Response): void {
 
-        const estadoHeader: string = req.get('estado');
-        const estado: boolean = castEstado(estadoHeader);
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
 
-        archivosModel.find({ estado: estado }, (err: CallbackError, archivosDB: Array<ArchivosInterface>) => {
+        archivosModel.find({})
+            .sort({ tipo: 1 })
+            .populate('idCreador')
+            .exec((err: any, archivosDB: Array<ArchivosInterface>) => {
 
-            if (err) {
+                if (err) {
+                    return resp.json({
+                        ok: false,
+                        mensaje: `Error interno`,
+                        err
+                    });
+                }
+
                 return resp.json({
-                    ok: false,
-                    mensaje: `Error interno`,
-                    err
+                    ok: true,
+                    archivosDB,
+                    cantidad: archivosDB.length
                 });
-            }
 
-            return resp.json({
-                ok: true,
-                archivosDB,
-                cantidad: archivosDB.length
             });
-        });
+    }
+
+    obtenerArchivosPorPedido(req: any, resp: Response): void {
+
+        const idPedido = req.get('idPedido');
+
+        archivosModel.find({ pedido: idPedido })
+            .sort({ tipo: 1 })
+            .populate('idCreador')
+            .exec((err: any, archivosDB: Array<any>) => {
+
+                if (err) {
+                    resp.json({
+                        ok: false,
+                        mensaje: `Error interno`,
+                        err
+                    });
+                }
+
+                resp.json({
+                    ok: true,
+                    archivosDB
+                });
+            });
     }
 
     obtenerArchivoAProbado(req: any, resp: Response): void {
@@ -352,7 +384,7 @@ export class ArchivoClass {
                         });
                     }
 
-                    pedidoModel.findByIdAndUpdate(pedido, { $pull: { archivos: { $in: id } } }, { new: true }, async (err: CallbackError, pedidoActualizadoDB: any) => {
+                    pedidoModel.findByIdAndUpdate(pedido, { $pull: { archivos: { $in: id } } }, { new: true }, async (err: CallbackError, archivoDB: any) => {
 
                         if (err) {
                             return resp.json({
@@ -362,7 +394,7 @@ export class ArchivoClass {
                             });
                         }
 
-                        if (!pedidoActualizadoDB) {
+                        if (!archivoDB) {
                             return resp.json({
                                 ok: false,
                                 mensaje: `No se encontró un pedido para eliminar archivos`
@@ -372,9 +404,13 @@ export class ArchivoClass {
                         const gestorCarpeta = new GestorCarpetaClass();
                         const respGestor = await gestorCarpeta.checkSize();
 
+                        const server = Server.instance;
+                        server.io.emit('recibir-archivos');
+
                         return resp.json({
                             ok: true,
-                            pedidoActualizadoDB,
+                            mensaje: 'Archivo eliminado',
+                            archivoDB,
                             carpeta: respGestor
                         });
                     });

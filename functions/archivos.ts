@@ -79,13 +79,13 @@ const subirArchivo = async (file: UploadedFile, req: Request): Promise<any> => {
     const random = Math.round(Math.random() * 100);
     let nombreArchivo: string = '';
 
-    if (!req.body.nombre || req.body.nombre === undefined || req.body.nombre === 'undefined') {
+    if (!req.body.nombre || req.body.nombre === 'null') {
         nombreArchivo = `${nanoid(10)}.${mime}`;
     } else {
         nombreArchivo = `${req.body.nombre}-${miliseconds}${random}.${mime}`;
     }
 
-    console.log(nombreArchivo);
+    // console.log(nombreArchivo);
 
     return new Promise((resolve, reject) => {
 

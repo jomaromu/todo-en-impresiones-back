@@ -1,20 +1,40 @@
 import path from 'path';
 import fs from 'fs';
 
-const directSizes = (dirPath: string, arrayOfFiles: Array<any>) => {
+const directSizes = (dirPath: string, arrayOfFiles: Array<any>): number => {
+
 
     const resp: Array<string> = getAllFiles(dirPath, arrayOfFiles);
+    let arrayFiles = 0;
 
-    const totalSize = resp.map((respFile) => {
 
-        const mapSizes = fs.statSync(respFile);
-        return mapSizes.size;
-    });
+    if (arrayOfFiles.length === 0) {
+        arrayFiles = 0;
+    }
 
-    return totalSize.reduce((acc: number, current: number) => {
+    if (arrayOfFiles.length !== 0) {
 
-        return acc + current;
-    });
+        const totalSize = resp.map((respFile) => {
+
+            const mapSizes = fs.statSync(respFile);
+            return mapSizes.size;
+        });
+
+        arrayFiles = totalSize.reduce((acc: number, current: number) => {
+            return acc + current;
+        });
+    }
+
+    return arrayFiles;
+    // const totalSize = resp.map((respFile) => {
+
+    //     const mapSizes = fs.statSync(respFile);
+    //     return mapSizes.size;
+    // });
+
+    // return totalSize.reduce((acc: number, current: number) => {
+    //     return acc + current;
+    // });
 
 }
 

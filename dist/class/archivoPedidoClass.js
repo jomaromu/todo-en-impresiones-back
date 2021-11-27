@@ -24,6 +24,7 @@ const pedidoModel_1 = __importDefault(require("../models/pedidoModel"));
 // Funciones externas
 const archivos_1 = require("../functions/archivos");
 const castEstado_1 = require("../functions/castEstado");
+const server_1 = __importDefault(require("./server"));
 class ArchivoClass {
     constructor() {
         this.idRef = (0, nanoid_1.nanoid)(10);
@@ -122,6 +123,8 @@ class ArchivoClass {
                                     }
                                     const gestorCarpeta = new gestorCarpetaClass_1.GestorCarpetaClass();
                                     const respGestor = yield gestorCarpeta.checkSize();
+                                    const server = server_1.default.instance;
+                                    server.io.emit('recibir-archivos');
                                     return resp.json({
                                         ok: true,
                                         mensaje: 'Archivo subido',
@@ -160,9 +163,12 @@ class ArchivoClass {
         });
     }
     obtenerTodosArchivos(req, resp) {
-        const estadoHeader = req.get('estado');
-        const estado = (0, castEstado_1.castEstado)(estadoHeader);
-        archivosModel_1.default.find({ estado: estado }, (err, archivosDB) => {
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
+        archivosModel_1.default.find({})
+            .sort({ tipo: 1 })
+            .populate('idCreador')
+            .exec((err, archivosDB) => {
             if (err) {
                 return resp.json({
                     ok: false,
@@ -174,6 +180,25 @@ class ArchivoClass {
                 ok: true,
                 archivosDB,
                 cantidad: archivosDB.length
+            });
+        });
+    }
+    obtenerArchivosPorPedido(req, resp) {
+        const idPedido = req.get('idPedido');
+        archivosModel_1.default.find({ pedido: idPedido })
+            .sort({ tipo: 1 })
+            .populate('idCreador')
+            .exec((err, archivosDB) => {
+            if (err) {
+                resp.json({
+                    ok: false,
+                    mensaje: `Error interno`,
+                    err
+                });
+            }
+            resp.json({
+                ok: true,
+                archivosDB
             });
         });
     }
@@ -278,7 +303,7 @@ class ArchivoClass {
                             mensaje: `No se encontró un pedido para eliminar archivos`
                         });
                     }
-                    pedidoModel_1.default.findByIdAndUpdate(pedido, { $pull: { archivos: { $in: id } } }, { new: true }, (err, pedidoActualizadoDB) => __awaiter(this, void 0, void 0, function* () {
+                    pedidoModel_1.default.findByIdAndUpdate(pedido, { $pull: { archivos: { $in: id } } }, { new: true }, (err, archivoDB) => __awaiter(this, void 0, void 0, function* () {
                         if (err) {
                             return resp.json({
                                 ok: false,
@@ -286,7 +311,7 @@ class ArchivoClass {
                                 err
                             });
                         }
-                        if (!pedidoActualizadoDB) {
+                        if (!archivoDB) {
                             return resp.json({
                                 ok: false,
                                 mensaje: `No se encontró un pedido para eliminar archivos`
@@ -294,9 +319,12 @@ class ArchivoClass {
                         }
                         const gestorCarpeta = new gestorCarpetaClass_1.GestorCarpetaClass();
                         const respGestor = yield gestorCarpeta.checkSize();
+                        const server = server_1.default.instance;
+                        server.io.emit('recibir-archivos');
                         return resp.json({
                             ok: true,
-                            pedidoActualizadoDB,
+                            mensaje: 'Archivo eliminado',
+                            archivoDB,
                             carpeta: respGestor
                         });
                     }));

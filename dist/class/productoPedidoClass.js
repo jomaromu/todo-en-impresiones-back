@@ -86,7 +86,7 @@ class ProductoPedido {
             if (!query.seguimiento_produccion) {
                 query.seguimiento_produccion = productoPedidoDB.seguimiento_produccion;
             }
-            productoPedidoModel_1.default.findByIdAndUpdate(id, query, { new: true }, (err, productoPedidoActualizadoDB) => __awaiter(this, void 0, void 0, function* () {
+            productoPedidoModel_1.default.findByIdAndUpdate(id, query, { new: true }, (err, productoPedidoDB) => __awaiter(this, void 0, void 0, function* () {
                 if (err) {
                     return resp.json({
                         ok: false,
@@ -94,7 +94,7 @@ class ProductoPedido {
                         err
                     });
                 }
-                if (!productoPedidoActualizadoDB) {
+                if (!productoPedidoDB) {
                     return resp.json({
                         ok: false,
                         mensaje: `No se encontró un producto pedido con ese ID`
@@ -102,7 +102,8 @@ class ProductoPedido {
                 }
                 return resp.json({
                     ok: true,
-                    productoPedidoActualizadoDB
+                    mensaje: 'Producto actualizado',
+                    productoPedidoDB
                 });
             }));
         });

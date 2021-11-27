@@ -19,6 +19,16 @@ class Server {
                 credentials: true
             }
         });
+        this.escucharConexiones();
+    }
+    static get instance() {
+        return this._instance || (this._instance = new this());
+    }
+    escucharConexiones() {
+        console.log('Escuchando conexiones');
+        this.io.on('connection', () => {
+            console.log(`Cliente conectado`);
+        });
     }
     // levantar el servidor
     start(callback) {

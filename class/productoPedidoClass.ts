@@ -103,7 +103,7 @@ export class ProductoPedido {
                 query.seguimiento_produccion = productoPedidoDB.seguimiento_produccion;
             }
 
-            productoPedidoModel.findByIdAndUpdate(id, query, { new: true }, async (err: CallbackError, productoPedidoActualizadoDB: any) => {
+            productoPedidoModel.findByIdAndUpdate(id, query, { new: true }, async (err: CallbackError, productoPedidoDB: any) => {
 
                 if (err) {
                     return resp.json({
@@ -113,7 +113,7 @@ export class ProductoPedido {
                     });
                 }
 
-                if (!productoPedidoActualizadoDB) {
+                if (!productoPedidoDB) {
                     return resp.json({
                         ok: false,
                         mensaje: `No se encontró un producto pedido con ese ID`
@@ -122,7 +122,8 @@ export class ProductoPedido {
 
                 return resp.json({
                     ok: true,
-                    productoPedidoActualizadoDB
+                    mensaje: 'Producto actualizado',
+                    productoPedidoDB
                 });
             });
         });

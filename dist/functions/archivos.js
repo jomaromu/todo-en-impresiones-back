@@ -70,13 +70,13 @@ const subirArchivo = (file, req) => __awaiter(void 0, void 0, void 0, function* 
     const miliseconds = new Date().getMilliseconds();
     const random = Math.round(Math.random() * 100);
     let nombreArchivo = '';
-    if (!req.body.nombre || req.body.nombre === undefined || req.body.nombre === 'undefined') {
+    if (!req.body.nombre || req.body.nombre === 'null') {
         nombreArchivo = `${(0, nanoid_1.nanoid)(10)}.${mime}`;
     }
     else {
         nombreArchivo = `${req.body.nombre}-${miliseconds}${random}.${mime}`;
     }
-    console.log(nombreArchivo);
+    // console.log(nombreArchivo);
     return new Promise((resolve, reject) => {
         const objArch = {
             ok: false,

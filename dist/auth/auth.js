@@ -295,7 +295,7 @@ exports.editarMetodoPago = editarMetodoPago;
 const editarPedido = (req, resp, next) => {
     const roleColaborador = req.usuario.colaborador_role;
     const id = req.get('id');
-    console.log(roleColaborador);
+    // console.log(roleColaborador);
     pedidoModel_1.default.findById(id, (err, pedidoDB) => {
         if (err) {
             return resp.json({

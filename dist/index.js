@@ -29,7 +29,8 @@ const origenPedidoRoute_1 = __importDefault(require("./routes/origenPedidoRoute"
 const categoriaRoute_1 = __importDefault(require("./routes/categoriaRoute"));
 const gestorCarpetaRoute_1 = __importDefault(require("./routes/gestorCarpetaRoute"));
 const ayudaRoute_1 = __importDefault(require("./routes/ayudaRoute"));
-const server = new server_1.default();
+// const server = new Server();
+const server = server_1.default.instance;
 // body parser
 server.app.use(body_parser_1.default.urlencoded({ extended: true }));
 server.app.use(body_parser_1.default.json());
