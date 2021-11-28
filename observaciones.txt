@@ -35,3 +35,6 @@ crear categoria de productos **
 productos no pertenecen a una sucursal **
 seguimiento siempre en grande, no debe haber scroll del text, solo de la ventana **
 cuando se inhabilita-habilita un pago crear un motivo **
+
+Cosas que puede ver y hacer el diseñador en los tabs de pedido
+Gestion de pagos

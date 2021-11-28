@@ -14,7 +14,7 @@ roleColRouter.post('/nuevoRole', [verificaToken, crearUsuario], (req: Request, r
 });
 
 // Editar role
-roleColRouter.put('/editarRole', [verificaToken, crearUsuario, editarRole], (req: Request, resp: Response) => {
+roleColRouter.put('/editarRole', [verificaToken, editarRole], (req: Request, resp: Response) => {
 
     const editarRole = new RoleColClass();
     editarRole.editarRole(req, resp);
@@ -22,7 +22,7 @@ roleColRouter.put('/editarRole', [verificaToken, crearUsuario, editarRole], (req
 });
 
 // Obtener role por ID
-roleColRouter.get('/obtenerRoleID', [verificaToken, crearUsuario], (req: Request, resp: Response) => {
+roleColRouter.get('/obtenerRoleID', [verificaToken], (req: Request, resp: Response) => {
 
     const obtenerRoleID = new RoleColClass();
     obtenerRoleID.obtenerRoleID(req, resp);
@@ -30,7 +30,7 @@ roleColRouter.get('/obtenerRoleID', [verificaToken, crearUsuario], (req: Request
 });
 
 // Obtener todos los roles
-roleColRouter.get('/obtenerTodos', [verificaToken, crearUsuario], (req: Request, resp: Response) => {
+roleColRouter.get('/obtenerTodos', [verificaToken], (req: Request, resp: Response) => {
 
     const obtenerTodos = new RoleColClass();
     obtenerTodos.obtenerTodos(req, resp);
@@ -38,7 +38,7 @@ roleColRouter.get('/obtenerTodos', [verificaToken, crearUsuario], (req: Request,
 });
 
 // Eliminar role
-roleColRouter.delete('/eliminarRole', [verificaToken, crearUsuario, eliminarRole], (req: Request, resp: Response) => {
+roleColRouter.delete('/eliminarRole', [verificaToken, eliminarRole], (req: Request, resp: Response) => {
 
     const eliminarRole = new RoleColClass();
     eliminarRole.eliminarRole(req, resp);

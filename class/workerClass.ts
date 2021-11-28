@@ -343,22 +343,27 @@ export class WorkkerClass {
                 });
             }
 
-            const resultado = evaluaRole(req.usuario.colaborador_role, usuario.colaborador_role);
+            return res.json({
+                ok: true,
+                usuario
+            });
 
-            if (resultado === 0) {
+            // const resultado = evaluaRole(req.usuario.colaborador_role, usuario.colaborador_role);
 
-                return res.json({
-                    ok: false,
-                    mensaje: `No está autorizado para realizar esta operación`
-                });
+            // if (resultado === 0) {
 
-            } else if (resultado === 1) {
+            //     return res.json({
+            //         ok: false,
+            //         mensaje: `No está autorizado para realizar esta operación`
+            //     });
 
-                return res.json({
-                    ok: true,
-                    usuario
-                });
-            }
+            // } else if (resultado === 1) {
+
+            //     return res.json({
+            //         ok: true,
+            //         usuario
+            //     });
+            // }
         });
     }
 
@@ -472,23 +477,29 @@ export class WorkkerClass {
                 })
             }
 
-            const resultado = evaluaRole(req.usuario.colaborador_role, role);
+            return res.json({
+                ok: true,
+                usuariosDB,
+                cantidad: usuariosDB.length
+            });
 
-            if (resultado === 0) {
+            // const resultado = evaluaRole(req.usuario.colaborador_role, role);
 
-                return res.json({
-                    ok: false,
-                    mensaje: `No está autorizado para realizar esta operación`
-                });
+            // if (resultado === 0) {
 
-            } else if (resultado === 1) {
+            //     return res.json({
+            //         ok: false,
+            //         mensaje: `No está autorizado para realizar esta operación`
+            //     });
 
-                return res.json({
-                    ok: true,
-                    usuariosDB,
-                    cantidad: usuariosDB.length
-                });
-            }
+            // } else if (resultado === 1) {
+
+            //     return res.json({
+            //         ok: true,
+            //         usuariosDB,
+            //         cantidad: usuariosDB.length
+            //     });
+            // }
 
         });
     }

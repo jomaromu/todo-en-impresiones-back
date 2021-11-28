@@ -8,7 +8,7 @@ pedidoRouter.post('/crearPedido', [auth_1.verificaToken], (req, resp) => {
     const crearPedido = new pedidosClass_1.PedidosClass();
     crearPedido.crearPedido(req, resp);
 });
-pedidoRouter.put('/editarPedido', [auth_1.verificaToken, auth_1.editarPedido], (req, resp) => {
+pedidoRouter.put('/editarPedido', [auth_1.verificaToken], (req, resp) => {
     const editarPedido = new pedidosClass_1.PedidosClass();
     editarPedido.editarPedido(req, resp);
 });
@@ -19,6 +19,10 @@ pedidoRouter.get('/obtenerPedidoID', [auth_1.verificaToken], (req, resp) => {
 pedidoRouter.delete('/eliminarPedidoID', [auth_1.verificaToken], (req, resp) => {
     const eliminarPedidoID = new pedidosClass_1.PedidosClass();
     eliminarPedidoID.eliminarPedidoID(req, resp);
+});
+pedidoRouter.get('/obtenerPedidosPorRole', [auth_1.verificaToken], (req, resp) => {
+    const obtenerPedidosPorRole = new pedidosClass_1.PedidosClass();
+    obtenerPedidosPorRole.obtenerPedidosPorRole(req, resp);
 });
 // pedidoRouter.get('/obtenerPedidosCriterio', [verificaToken], (req: Request, resp: Response) => {
 //     const obtenerPedidosCriterio = new PedidosClass();

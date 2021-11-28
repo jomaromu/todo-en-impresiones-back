@@ -12,7 +12,7 @@ pedidoRouter.post('/crearPedido', [verificaToken], (req: Request, resp: Response
     crearPedido.crearPedido(req, resp);
 });
 
-pedidoRouter.put('/editarPedido', [verificaToken, editarPedido], (req: Request, resp: Response) => { // Pendiente  auth editarPedido
+pedidoRouter.put('/editarPedido', [verificaToken], (req: Request, resp: Response) => { // Pendiente  auth editarPedido
 
     const editarPedido = new PedidosClass();
     editarPedido.editarPedido(req, resp);
@@ -28,6 +28,12 @@ pedidoRouter.delete('/eliminarPedidoID', [verificaToken], (req: Request, resp: R
 
     const eliminarPedidoID = new PedidosClass();
     eliminarPedidoID.eliminarPedidoID(req, resp);
+});
+
+pedidoRouter.get('/obtenerPedidosPorRole', [verificaToken], (req: Request, resp: Response) => {
+
+    const obtenerPedidosPorRole = new PedidosClass();
+    obtenerPedidosPorRole.obtenerPedidosPorRole(req, resp);
 });
 
 // pedidoRouter.get('/obtenerPedidosCriterio', [verificaToken], (req: Request, resp: Response) => {

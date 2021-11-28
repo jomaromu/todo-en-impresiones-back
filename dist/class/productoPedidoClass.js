@@ -50,6 +50,12 @@ class ProductoPedido {
             //         mensaje: `No puede agregar productos ya que existen pagos registrados`
             //     });
             // }
+            if (pedidoDB.etapa_pedido === 0) {
+                return resp.json({
+                    ok: false,
+                    mensaje: 'La etapa del pedido debe estar pendiente'
+                });
+            }
             const productosPedidos = pedidoDB.productos_pedidos;
             // Si no hay productos pedidos
             if (productosPedidos.length === 0 || !productosPedidos) {

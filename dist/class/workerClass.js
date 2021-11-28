@@ -292,19 +292,22 @@ class WorkkerClass {
                     mensaje: `No existe el Usuario en la base de datos`
                 });
             }
-            const resultado = (0, nivelWorker_1.evaluaRole)(req.usuario.colaborador_role, usuario.colaborador_role);
-            if (resultado === 0) {
-                return res.json({
-                    ok: false,
-                    mensaje: `No está autorizado para realizar esta operación`
-                });
-            }
-            else if (resultado === 1) {
-                return res.json({
-                    ok: true,
-                    usuario
-                });
-            }
+            return res.json({
+                ok: true,
+                usuario
+            });
+            // const resultado = evaluaRole(req.usuario.colaborador_role, usuario.colaborador_role);
+            // if (resultado === 0) {
+            //     return res.json({
+            //         ok: false,
+            //         mensaje: `No está autorizado para realizar esta operación`
+            //     });
+            // } else if (resultado === 1) {
+            //     return res.json({
+            //         ok: true,
+            //         usuario
+            //     });
+            // }
         });
     }
     // Obtener usuario por ID Referencia
@@ -391,20 +394,24 @@ class WorkkerClass {
                     usuariosDB
                 });
             }
-            const resultado = (0, nivelWorker_1.evaluaRole)(req.usuario.colaborador_role, role);
-            if (resultado === 0) {
-                return res.json({
-                    ok: false,
-                    mensaje: `No está autorizado para realizar esta operación`
-                });
-            }
-            else if (resultado === 1) {
-                return res.json({
-                    ok: true,
-                    usuariosDB,
-                    cantidad: usuariosDB.length
-                });
-            }
+            return res.json({
+                ok: true,
+                usuariosDB,
+                cantidad: usuariosDB.length
+            });
+            // const resultado = evaluaRole(req.usuario.colaborador_role, role);
+            // if (resultado === 0) {
+            //     return res.json({
+            //         ok: false,
+            //         mensaje: `No está autorizado para realizar esta operación`
+            //     });
+            // } else if (resultado === 1) {
+            //     return res.json({
+            //         ok: true,
+            //         usuariosDB,
+            //         cantidad: usuariosDB.length
+            //     });
+            // }
         });
     }
     // Obtener usuarios por criterio nombre

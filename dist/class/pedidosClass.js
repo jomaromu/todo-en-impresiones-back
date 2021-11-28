@@ -319,6 +319,120 @@ class PedidosClass {
     //     //     });
     //     // }
     // }
+    obtenerPedidosPorRole(req, resp) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const role = req.get('role');
+            const idSucursalWorker = req.get('idSucursalWorker');
+            // const idWorker = req.get('idWorker');
+            // console.log(req.usuario._id);
+            const match = {
+                $match: {}
+            };
+            if (role === environment_1.environmnet.colRole.VendedorNormalRole) {
+                match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }] };
+            }
+            if (role === environment_1.environmnet.colRole.produccionNormal) {
+                match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }, { 'etapa_pedido': 2 }] };
+            }
+            if (role === environment_1.environmnet.colRole.DiseniadorRole) {
+                match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }, { 'etapa_pedido': 1 }, { 'AsignadoA._id': new mongoose.Types.ObjectId(req.usuario._id) }] };
+            }
+            const pedidosDB = yield pedidoModel_1.default.aggregate([
+                {
+                    $lookup: {
+                        from: 'prioridadpedidos',
+                        localField: 'prioridad_pedido',
+                        foreignField: '_id',
+                        as: 'PrioridadPedido'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'archivos',
+                        localField: 'archivos',
+                        foreignField: '_id',
+                        as: 'Archivos'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'productopedidos',
+                        localField: 'productos_pedidos',
+                        foreignField: '_id',
+                        as: 'ProductosPedidos'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'pagos',
+                        localField: 'pagos_pedido',
+                        foreignField: '_id',
+                        as: 'PagosPedido'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'userworkers',
+                        localField: 'idCreador',
+                        foreignField: '_id',
+                        as: 'IDCreador'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'userclients',
+                        localField: 'cliente',
+                        foreignField: '_id',
+                        as: 'Cliente'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'userworkers',
+                        localField: 'asignado_a',
+                        foreignField: '_id',
+                        as: 'AsignadoA'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'etapapedidos',
+                        localField: 'etapa_pedido',
+                        foreignField: '_id',
+                        as: 'EtapaPedido'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'sucursales',
+                        localField: 'sucursal',
+                        foreignField: '_id',
+                        as: 'Sucursal'
+                    }
+                },
+                match,
+                {
+                    $sort: { etapa_pedido: 1, prioridad_pedido: 1, fecha_actual: 1 } // prioridad_pedido: 1, fecha_actual: 1
+                },
+                {
+                    $unset: ['IDCreador.password', 'EtapaPedido.nivel', 'PrioridadPedido.nivel']
+                }
+            ]);
+            if (!pedidosDB || pedidosDB.length === 0) {
+                return resp.json({
+                    ok: false,
+                    mensaje: `No se encontraron pedidos`
+                });
+            }
+            else {
+                return resp.json({
+                    ok: true,
+                    pedidosDB: pedidosDB,
+                    cantidad: pedidosDB.length
+                });
+            }
+        });
+    }
     obtenerTodos(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {
             // const estadoHeader: string = req.get('estado');
@@ -661,7 +775,7 @@ class PedidosClass {
                 $match: {}
             };
             if (role === environment_1.environmnet.colRole.VendedorNormalRole) {
-                match.$match = { 'Sucursal._id': new mongoose.Types.ObjectId(sucursalCol), estado: estado };
+                match.$match = { 'Sucursal._id': new mongoose.Types.ObjectId(sucursalCol) }; //, estado: estado
             }
             const resPedido = yield pedidoModel_1.default.aggregate([
                 {
