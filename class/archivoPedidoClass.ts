@@ -117,16 +117,16 @@ export class ArchivoClass {
                                 });
                             }
 
-                            if (pedidoDB.productos_pedidos.length <= 0) {
+                            // if (pedidoDB.productos_pedidos.length <= 0) {
 
-                                eliminarArchivo(nombre_archivo);
-                                await archivosModel.findByIdAndDelete(archivoDB._id);
+                            //     eliminarArchivo(nombre_archivo);
+                            //     await archivosModel.findByIdAndDelete(archivoDB._id);
 
-                                return resp.json({
-                                    ok: false,
-                                    mensaje: `Debe agregar un producto para poder crear archivos`
-                                });
-                            }
+                            //     return resp.json({
+                            //         ok: false,
+                            //         mensaje: `Debe agregar un producto para poder crear archivos`
+                            //     });
+                            // }
 
                             pedidoModel.findByIdAndUpdate(pedido, { $push: { archivos: archivoDB._id } }, { new: true }, async (err: CallbackError, pedidoDB: any) => {
 

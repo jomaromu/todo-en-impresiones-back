@@ -156,6 +156,8 @@ export class WorkkerClass {
         const id = req.get('id') || '';
         const colaborador_role = req.get('colaborador_role') || '';
 
+        const permitidas: Array<any> = req.body.permitidas;
+
         const datosNuevos = {
             nombre: req.body.nombre,
             apellido: req.body.apellido,
@@ -164,6 +166,7 @@ export class WorkkerClass {
             estado: req.body.estado,
             identificacion: req.body.identificacion,
             colaborador_role: colaborador_role,
+            permitidas
         }
 
         workerModel.findById(id, (err: CallbackError, usuarioDB: WorkerModelInterface) => {
@@ -183,6 +186,32 @@ export class WorkkerClass {
                 });
             }
 
+            // console.log(permitidas);
+
+
+            // return;
+            const mapPermitidos = permitidas.map(permitida => {
+
+                if (permitida !== null) {
+
+                    if (permitida.check === false || !permitida) {
+                        permitida = null;
+                        return permitida;
+                    } else {
+                        return permitida.id;
+                    }
+                }
+
+            });
+
+            const filterPermitida = mapPermitidos.filter(permitida => {
+                return permitida !== undefined;
+            });
+
+            console.log(filterPermitida);
+
+            datosNuevos.permitidas = filterPermitida;
+
             // if (req.usuario.correo === usuarioDB.correo) {
 
             //     return res.json({
@@ -191,6 +220,7 @@ export class WorkkerClass {
             //     });
             // }
 
+            // return;
             if (!req.body.nombre) {
                 datosNuevos.nombre = usuarioDB.nombre;
             }

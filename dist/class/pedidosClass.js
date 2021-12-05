@@ -323,19 +323,19 @@ class PedidosClass {
         return __awaiter(this, void 0, void 0, function* () {
             const role = req.get('role');
             const idSucursalWorker = req.get('idSucursalWorker');
-            // const idWorker = req.get('idWorker');
+            const idUsuario = req.get('idUsuario');
             // console.log(req.usuario._id);
             const match = {
                 $match: {}
             };
             if (role === environment_1.environmnet.colRole.VendedorNormalRole) {
-                match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }] };
+                match.$match = { $and: [{ 'IDCreador._id': new mongoose.Types.ObjectId(idUsuario) }] };
             }
             if (role === environment_1.environmnet.colRole.produccionNormal) {
                 match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }, { 'etapa_pedido': 2 }] };
             }
             if (role === environment_1.environmnet.colRole.DiseniadorRole) {
-                match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }, { 'etapa_pedido': 1 }, { 'AsignadoA._id': new mongoose.Types.ObjectId(req.usuario._id) }] };
+                match.$match = { $and: [{ 'etapa_pedido': 1 }, { 'AsignadoA._id': new mongoose.Types.ObjectId(idUsuario) }] };
             }
             const pedidosDB = yield pedidoModel_1.default.aggregate([
                 {
@@ -767,15 +767,17 @@ class PedidosClass {
     }
     obtenerVendedor(req, resp) {
         return __awaiter(this, void 0, void 0, function* () {
-            const estadoHeader = req.get('estado');
-            const estado = (0, castEstado_1.castEstado)(estadoHeader);
+            // const estadoHeader: string = req.get('estado');
+            // const estado: boolean = castEstado(estadoHeader);
+            const idUsuario = req.get('idUsuario');
             const role = req.usuario.colaborador_role;
             const sucursalCol = req.usuario.sucursal;
             const match = {
                 $match: {}
             };
             if (role === environment_1.environmnet.colRole.VendedorNormalRole) {
-                match.$match = { 'Sucursal._id': new mongoose.Types.ObjectId(sucursalCol) }; //, estado: estado
+                // match.$match = { 'Sucursal._id': new mongoose.Types.ObjectId(sucursalCol) } //, estado: estado
+                match.$match = { 'IDCreador._id': new mongoose.Types.ObjectId(idUsuario) }; //, estado: estado
             }
             const resPedido = yield pedidoModel_1.default.aggregate([
                 {

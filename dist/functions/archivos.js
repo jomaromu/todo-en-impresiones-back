@@ -47,12 +47,13 @@ const extraerArchivo = (files) => __awaiter(void 0, void 0, void 0, function* ()
 });
 exports.extraerArchivo = extraerArchivo;
 const verificaMime = (file, resolve, reject, objArchivo) => {
-    // const mime = file.mimetype;
-    const arrayMime = file.mimetype.split('/');
-    const mime = arrayMime[arrayMime.length - 1];
-    if (mime !== 'png' && mime !== 'jpeg' && mime !== 'svg' && mime !== 'tif' && mime !== 'tiff' && mime !== 'jpg' && mime !== 'ppt' && mime !== 'pdf') {
+    const mime = file.mimetype;
+    // const arrayMime = file.mimetype.split('/');
+    // const mime = arrayMime[arrayMime.length - 1];
+    console.log(mime);
+    if (mime !== 'text/plain' && mime !== 'image/png' && mime !== 'image/svg+xml' && mime !== 'image/tiff' && mime !== 'image/jpeg' && mime !== 'application/vnd.ms-powerpoint' && mime !== 'application/vnd.openxmlformats-officedocument.presentationml.presentation' && mime !== 'application/pdf' && mime !== 'application/msword' && mime !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' && mime !== 'text/pain' && mime !== 'application/vnd.ms-excel' && mime !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
         objArchivo.ok = false;
-        objArchivo.mensaje = `El archivo no parece ser una imágen válida`;
+        objArchivo.mensaje = `El archivo no permitido`;
         resolve(objArchivo);
     }
     else {

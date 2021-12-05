@@ -53,12 +53,14 @@ export class ProductoPedido {
                 //     });
                 // }
 
-                if (pedidoDB.etapa_pedido === 0) {
+                if (pedidoDB.etapa_pedido !== 0) {
                     return resp.json({
                         ok: false,
                         mensaje: 'La etapa del pedido debe estar pendiente'
                     });
                 }
+
+                console.log(pedidoDB.etapa_pedido);
 
                 const productosPedidos: Array<any> = pedidoDB.productos_pedidos;
 

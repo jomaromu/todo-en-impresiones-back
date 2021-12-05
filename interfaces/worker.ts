@@ -15,4 +15,5 @@ export interface WorkerModelInterface {
     sucursal: any;
     identificacion?: string;
     observacion: string;
+    permitidas: Array<string>;
 }

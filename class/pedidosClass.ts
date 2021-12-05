@@ -399,7 +399,7 @@ export class PedidosClass {
 
         const role = req.get('role');
         const idSucursalWorker = req.get('idSucursalWorker');
-        // const idWorker = req.get('idWorker');
+        const idUsuario = req.get('idUsuario');
 
         // console.log(req.usuario._id);
         const match = {
@@ -407,13 +407,15 @@ export class PedidosClass {
         };
 
         if (role === environmnet.colRole.VendedorNormalRole) {
-            match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }] }
+            match.$match = { $and: [{ 'IDCreador._id': new mongoose.Types.ObjectId(idUsuario) }] }
         }
+
         if (role === environmnet.colRole.produccionNormal) {
             match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }, { 'etapa_pedido': 2 }] }
         }
+
         if (role === environmnet.colRole.DiseniadorRole) {
-            match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }, { 'etapa_pedido': 1 }, { 'AsignadoA._id': new mongoose.Types.ObjectId(req.usuario._id) }] }
+            match.$match = { $and: [{ 'etapa_pedido': 1 }, { 'AsignadoA._id': new mongoose.Types.ObjectId(idUsuario) }] }
         }
 
         const pedidosDB = await pedidoModel.aggregate([
@@ -867,8 +869,9 @@ export class PedidosClass {
 
     async obtenerVendedor(req: any, resp: Response): Promise<any> { // Produccion
 
-        const estadoHeader: string = req.get('estado');
-        const estado: boolean = castEstado(estadoHeader);
+        // const estadoHeader: string = req.get('estado');
+        // const estado: boolean = castEstado(estadoHeader);
+        const idUsuario = req.get('idUsuario');
 
         const role = req.usuario.colaborador_role;
         const sucursalCol = req.usuario.sucursal;
@@ -878,7 +881,8 @@ export class PedidosClass {
 
         if (role === environmnet.colRole.VendedorNormalRole) {
 
-            match.$match = { 'Sucursal._id': new mongoose.Types.ObjectId(sucursalCol) } //, estado: estado
+            // match.$match = { 'Sucursal._id': new mongoose.Types.ObjectId(sucursalCol) } //, estado: estado
+            match.$match = { 'IDCreador._id': new mongoose.Types.ObjectId(idUsuario) } //, estado: estado
 
         }
 

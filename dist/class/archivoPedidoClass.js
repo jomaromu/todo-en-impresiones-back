@@ -95,14 +95,14 @@ class ArchivoClass {
                                         mensaje: `No se encontró un pedido para anexar un archivo`
                                     });
                                 }
-                                if (pedidoDB.productos_pedidos.length <= 0) {
-                                    (0, archivos_1.eliminarArchivo)(nombre_archivo);
-                                    yield archivosModel_1.default.findByIdAndDelete(archivoDB._id);
-                                    return resp.json({
-                                        ok: false,
-                                        mensaje: `Debe agregar un producto para poder crear archivos`
-                                    });
-                                }
+                                // if (pedidoDB.productos_pedidos.length <= 0) {
+                                //     eliminarArchivo(nombre_archivo);
+                                //     await archivosModel.findByIdAndDelete(archivoDB._id);
+                                //     return resp.json({
+                                //         ok: false,
+                                //         mensaje: `Debe agregar un producto para poder crear archivos`
+                                //     });
+                                // }
                                 pedidoModel_1.default.findByIdAndUpdate(pedido, { $push: { archivos: archivoDB._id } }, { new: true }, (err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
                                     if (err) {
                                         (0, archivos_1.eliminarArchivo)(nombre_archivo);

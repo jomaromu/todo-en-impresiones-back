@@ -36,5 +36,17 @@ productos no pertenecen a una sucursal **
 seguimiento siempre en grande, no debe haber scroll del text, solo de la ventana **
 cuando se inhabilita-habilita un pago crear un motivo **
 
-Cosas que puede ver y hacer el diseñador en los tabs de pedido
-Gestion de pagos
+
+// =========================================================================================== //
+
+agregar excel, txt y word a las extensiones de archivos **
+puede subir archivos sin importar que hayan productos o no **
+solo mostrar nombre de archivo subido quitar id **
+cuando se guarde información tambien guardar suguimiento **
+en archivos se pueden subir pagos **
+agregar fila de saldo en productos y pagos simultaneamente y si es negativo enviar alerta
+
+diseniador no ve total ni saldo, no ve telefono ni ruc, solo puede cambiar la etapa de pedido, quitar pestaña de producto, quitar pestaña de pagos
+
+en bitacora registrar cambio de etapa y cambio de color
+eliminar bitacora por fecha
