@@ -30,8 +30,8 @@ const PedidoSchema = new Schema({
     estado_pedido: { type: Number, default: 0 },
     itbms: { type: Boolean, default: false },
     // monto_itbms: { type: Number, default: 0 },
-    // subtotal: { type: Number, default: 0 },
-    saldo: { type: Number, default: 0 },
+    subtotal: { type: Number, default: 0 },
+    // saldo: { type: Number, default: 0 },
     total: { type: Number, default: 0 },
     // bandeja: { type: String, default: 'todos' } // todos, produccion, diseniador, vendedor, admin-super
 });

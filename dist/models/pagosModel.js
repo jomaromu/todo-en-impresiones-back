@@ -11,13 +11,13 @@ const modalidad = {
 // crear esquema
 const Schema = mongoose_1.default.Schema;
 const pagosSchemas = new Schema({
-    idCreador: { type: String, required: [true, 'Es necesario el ID del creador'] },
-    metodo: { type: String },
-    modalidad: { type: String, required: [true, 'La modalidad necesaria'], enum: modalidad },
-    ruta_comprobante: { type: String },
+    idCreador: { type: mongoose_1.default.Types.ObjectId, ref: 'userWorker', required: [true, 'Es necesario el ID del creador'] },
+    metodo: { type: mongoose_1.default.Types.ObjectId, ref: 'metodoPago', required: [true, 'El método de pago es necesario'] },
+    modalidad: { type: Number, required: [true, 'La modalidad necesaria'] },
+    // ruta_comprobante: { type: String },
     fecha: { type: String },
     estado: { type: Boolean, default: true },
-    nombre_archivo: { type: String },
+    // nombre_archivo: { type: String },
     motivo: { type: String },
     monto: { type: Number, default: 0 }
 });

@@ -156,7 +156,7 @@ export class WorkkerClass {
         const id = req.get('id') || '';
         const colaborador_role = req.get('colaborador_role') || '';
 
-        const permitidas: Array<any> = req.body.permitidas;
+        // const permitidas: Array<any> = req.body.permitidas;
 
         const datosNuevos = {
             nombre: req.body.nombre,
@@ -166,7 +166,7 @@ export class WorkkerClass {
             estado: req.body.estado,
             identificacion: req.body.identificacion,
             colaborador_role: colaborador_role,
-            permitidas
+            // permitidas
         }
 
         workerModel.findById(id, (err: CallbackError, usuarioDB: WorkerModelInterface) => {
@@ -190,27 +190,27 @@ export class WorkkerClass {
 
 
             // return;
-            const mapPermitidos = permitidas.map(permitida => {
+            // const mapPermitidos = permitidas.map(permitida => {
 
-                if (permitida !== null) {
+            //     if (permitida !== null) {
 
-                    if (permitida.check === false || !permitida) {
-                        permitida = null;
-                        return permitida;
-                    } else {
-                        return permitida.id;
-                    }
-                }
+            //         if (permitida.check === false || !permitida) {
+            //             permitida = null;
+            //             return permitida;
+            //         } else {
+            //             return permitida.id;
+            //         }
+            //     }
 
-            });
+            // });
 
-            const filterPermitida = mapPermitidos.filter(permitida => {
-                return permitida !== undefined;
-            });
+            // const filterPermitida = mapPermitidos.filter(permitida => {
+            //     return permitida !== undefined;
+            // });
 
-            console.log(filterPermitida);
+            // console.log(filterPermitida);
 
-            datosNuevos.permitidas = filterPermitida;
+            // datosNuevos.permitidas = filterPermitida;
 
             // if (req.usuario.correo === usuarioDB.correo) {
 

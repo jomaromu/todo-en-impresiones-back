@@ -119,16 +119,20 @@ export class PedidosClass {
 
         const id = new mongoose.Types.ObjectId(req.get('id'));
         const sucursal = req.body.sucursal;
-        const etapa_pedido = req.body.etapa_pedido;
+        const etapa_pedido = Number(req.body.etapa_pedido);
         const prioridad_pedido = req.body.prioridad_pedido;
         const asignado_a = req.body.asignado_a;
         const estado_pedido = req.body.estado_pedido;
         const origen_pedido = req.body.origen_pedido;
         const fecha_entrega = req.body.fecha_entrega;
         const itbms = req.body.itbms;
+        const subtotal = Number(req.body.subtotal);
+        const total = Number(req.body.total);
 
-        let montoItbms: number = 0;
-        let total: number = 0;
+        // console.log(subtotal, total)
+
+        // let montoItbms: number = 0;
+        // let total: number = 0;
 
         // const estadoHeader: string = req.get('estado');
         // const estado: boolean = castEstado(estadoHeader);
@@ -143,6 +147,7 @@ export class PedidosClass {
             .populate('asignado_a')
             .populate('origen_pedido')
             .populate('productos_pedidos')
+            .populate('pagos_pedido')
             .exec();
 
         // if (pedidoDB.productos_pedidos.length <= 0) {
@@ -173,14 +178,18 @@ export class PedidosClass {
             estado_pedido: estado_pedido,
             origen_pedido: origen_pedido,
             fecha_entrega: fecha_entrega,
-            itbms: itbms
+            itbms: itbms,
+            subtotal,
+            total
         }
+
+        // console.log('itbms', query.itbms)
 
         if (!query.sucursal) {
             query.sucursal = pedidoDB.sucursal;
         }
 
-        if (!query.etapa_pedido) {
+        if (isNaN(query.etapa_pedido)) {
             query.etapa_pedido = pedidoDB.etapa_pedido;
         }
 
@@ -188,9 +197,9 @@ export class PedidosClass {
             query.prioridad_pedido = pedidoDB.prioridad_pedido;
         }
 
-        if (!query.asignado_a) {
-            query.asignado_a = pedidoDB.asignado_a;
-        }
+        // if (!query.asignado_a) {
+        //     query.asignado_a = pedidoDB.asignado_a;
+        // }
 
         // if (!query.estado) {
         //     query.estado = pedidoDB.estado;
@@ -224,9 +233,17 @@ export class PedidosClass {
             query.fecha_entrega = pedidoDB.fecha_entrega;
         }
 
-        // if (!query.itbms) {
-        //     query.itbms = pedidoDB.itbms;
-        // }
+        if (isNaN(subtotal)) {
+            query.subtotal = pedidoDB.subtotal;
+        }
+
+        if (isNaN(total)) {
+            query.total = pedidoDB.total;
+        }
+
+        if (query.itbms === undefined) {
+            query.itbms = pedidoDB.itbms;
+        }
 
         // console.log(itbms);
 
@@ -239,6 +256,7 @@ export class PedidosClass {
             .populate('asignado_a')
             .populate('origen_pedido')
             .populate('productos_pedidos')
+            .populate('pagos_pedido')
             .exec(async (err: CallbackError, pedidoDB: PedidoModelInterface | any) => {
 
                 if (err) {
@@ -314,6 +332,7 @@ export class PedidosClass {
 
                 return resp.json({
                     ok: true,
+                    mensaje: `Pedidos Ok`,
                     pedidoDB
                 });
             });

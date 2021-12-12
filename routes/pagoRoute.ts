@@ -17,6 +17,18 @@ pagoRoute.get('/obtenerPagoID', [verificaToken], (req: Request, resp: Response) 
     obtenerPagoID.obtenerPagoID(req, resp);
 });
 
+pagoRoute.get('/obtenerPagos', [verificaToken], (req: Request, resp: Response) => {
+
+    const obtenerPagos = new PagoClass();
+    obtenerPagos.obtenerPagos(req, resp);
+});
+
+pagoRoute.get('/obtenerPagosPorPedido', [verificaToken], (req: Request, resp: Response) => {
+
+    const obtenerPagosPorPedido = new PagoClass();
+    obtenerPagosPorPedido.obtenerPagosPorPedido(req, resp);
+});
+
 pagoRoute.put('/deshabilitarPago', [verificaToken], (req: Request, resp: Response) => {
 
     const deshabilitarPago = new PagoClass();

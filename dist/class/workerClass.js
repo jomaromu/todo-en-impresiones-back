@@ -139,7 +139,7 @@ class WorkkerClass {
     editarUsuario(req, res) {
         const id = req.get('id') || '';
         const colaborador_role = req.get('colaborador_role') || '';
-        const permitidas = req.body.permitidas;
+        // const permitidas: Array<any> = req.body.permitidas;
         const datosNuevos = {
             nombre: req.body.nombre,
             apellido: req.body.apellido,
@@ -148,7 +148,7 @@ class WorkkerClass {
             estado: req.body.estado,
             identificacion: req.body.identificacion,
             colaborador_role: colaborador_role,
-            permitidas
+            // permitidas
         };
         workerModel_1.default.findById(id, (err, usuarioDB) => {
             if (err) {
@@ -166,22 +166,21 @@ class WorkkerClass {
             }
             // console.log(permitidas);
             // return;
-            const mapPermitidos = permitidas.map(permitida => {
-                if (permitida !== null) {
-                    if (permitida.check === false || !permitida) {
-                        permitida = null;
-                        return permitida;
-                    }
-                    else {
-                        return permitida.id;
-                    }
-                }
-            });
-            const filterPermitida = mapPermitidos.filter(permitida => {
-                return permitida !== undefined;
-            });
-            console.log(filterPermitida);
-            datosNuevos.permitidas = filterPermitida;
+            // const mapPermitidos = permitidas.map(permitida => {
+            //     if (permitida !== null) {
+            //         if (permitida.check === false || !permitida) {
+            //             permitida = null;
+            //             return permitida;
+            //         } else {
+            //             return permitida.id;
+            //         }
+            //     }
+            // });
+            // const filterPermitida = mapPermitidos.filter(permitida => {
+            //     return permitida !== undefined;
+            // });
+            // console.log(filterPermitida);
+            // datosNuevos.permitidas = filterPermitida;
             // if (req.usuario.correo === usuarioDB.correo) {
             //     return res.json({
             //         ok: false,

@@ -60,7 +60,7 @@ export class ProductoPedido {
                     });
                 }
 
-                console.log(pedidoDB.etapa_pedido);
+                // console.log(pedidoDB.etapa_pedido);
 
                 const productosPedidos: Array<any> = pedidoDB.productos_pedidos;
 
@@ -143,6 +143,7 @@ export class ProductoPedido {
         const id = req.get('id');
 
         productoPedidoModel.findById(id)
+            .populate('pagos_pedido')
             .populate('producto')
             .exec((err: CallbackError, productoPedidoDB: any) => {
 
@@ -174,6 +175,7 @@ export class ProductoPedido {
 
         pedidoModel.findById(pedido)
             .populate({ path: 'productos_pedidos', populate: { path: 'producto' } })
+            .populate('pagos_pedido')
             .exec((err: any, pedidoDB: any) => {
 
                 if (err) {
@@ -447,7 +449,14 @@ export class ProductoPedido {
         let totalPedido: number = 0;
 
         let itbmsProductoPedido: number = 0;
-        let query = {};
+        let query = {
+            // subtotal: Number(req.body.subtotalPedido),
+            // total: Number(req.body.totalPedido)
+        };
+
+        // console.log(query);
+
+        // console.log(itbms)
 
         if (isNaN(precio) || isNaN(cantidad)) {
 
@@ -563,6 +572,7 @@ export class ProductoPedido {
                 // Actualizar el pedido
                 pedidoModel.findByIdAndUpdate(idPedido, query, { new: true })
                     .populate([{ path: 'productos_pedidos', model: 'pedidos', populate: { path: 'producto', model: 'products' } }])
+                    .populate('pagos_pedido')
                     .exec(async (err: CallbackError, pedidoDB: any) => {
 
                         if (err) {

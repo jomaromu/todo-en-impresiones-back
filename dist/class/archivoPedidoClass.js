@@ -95,6 +95,7 @@ class ArchivoClass {
                                         mensaje: `No se encontró un pedido para anexar un archivo`
                                     });
                                 }
+                                // console.log('algo')
                                 // if (pedidoDB.productos_pedidos.length <= 0) {
                                 //     eliminarArchivo(nombre_archivo);
                                 //     await archivosModel.findByIdAndDelete(archivoDB._id);
@@ -134,6 +135,7 @@ class ArchivoClass {
                                     });
                                 }));
                             }));
+                            // console.log()
                         }
                     });
                 }

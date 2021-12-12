@@ -50,3 +50,6 @@ diseniador no ve total ni saldo, no ve telefono ni ruc, solo puede cambiar la et
 
 en bitacora registrar cambio de etapa y cambio de color
 eliminar bitacora por fecha
+
+REVISAR CAST DE NUMEROS VALIDARLOS CON ISNAN
+REVISAR EL MODAL DE PAGOS PARA LA VALIDACION DE SUS INPUTS

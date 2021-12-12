@@ -117,6 +117,8 @@ export class ArchivoClass {
                                 });
                             }
 
+                            // console.log('algo')
+
                             // if (pedidoDB.productos_pedidos.length <= 0) {
 
                             //     eliminarArchivo(nombre_archivo);
@@ -166,6 +168,8 @@ export class ArchivoClass {
                                 });
                             });
                         });
+
+                        // console.log()
                     }
                 });
 

@@ -56,7 +56,7 @@ class ProductoPedido {
                     mensaje: 'La etapa del pedido debe estar pendiente'
                 });
             }
-            console.log(pedidoDB.etapa_pedido);
+            // console.log(pedidoDB.etapa_pedido);
             const productosPedidos = pedidoDB.productos_pedidos;
             // Si no hay productos pedidos
             if (productosPedidos.length === 0 || !productosPedidos) {
@@ -118,6 +118,7 @@ class ProductoPedido {
     obtenerProductoPedido(req, resp) {
         const id = req.get('id');
         productoPedidoModel_1.default.findById(id)
+            .populate('pagos_pedido')
             .populate('producto')
             .exec((err, productoPedidoDB) => {
             if (err) {
@@ -143,6 +144,7 @@ class ProductoPedido {
         const pedido = req.get('pedido');
         pedidoModel_1.default.findById(pedido)
             .populate({ path: 'productos_pedidos', populate: { path: 'producto' } })
+            .populate('pagos_pedido')
             .exec((err, pedidoDB) => {
             if (err) {
                 return resp.json({
@@ -353,7 +355,12 @@ class ProductoPedido {
         let itbmsPedido = 0;
         let totalPedido = 0;
         let itbmsProductoPedido = 0;
-        let query = {};
+        let query = {
+        // subtotal: Number(req.body.subtotalPedido),
+        // total: Number(req.body.totalPedido)
+        };
+        // console.log(query);
+        // console.log(itbms)
         if (isNaN(precio) || isNaN(cantidad)) {
             return resp.json({
                 ok: false,
@@ -441,6 +448,7 @@ class ProductoPedido {
                 // Actualizar el pedido
                 pedidoModel_1.default.findByIdAndUpdate(idPedido, query, { new: true })
                     .populate([{ path: 'productos_pedidos', model: 'pedidos', populate: { path: 'producto', model: 'products' } }])
+                    .populate('pagos_pedido')
                     .exec((err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
                     if (err) {
                         return resp.json({

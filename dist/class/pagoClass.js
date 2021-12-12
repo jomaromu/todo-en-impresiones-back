@@ -18,8 +18,7 @@ moment_1.default.locale('es');
 // Modelos
 const pagosModel_1 = __importDefault(require("../models/pagosModel"));
 const pedidoModel_1 = __importDefault(require("../models/pedidoModel"));
-// Funciones externas
-const archivos_1 = require("../functions/archivos");
+const server_1 = __importDefault(require("./server"));
 class PagoClass {
     constructor() { }
     crearPago(req, resp) {
@@ -73,88 +72,122 @@ class PagoClass {
     ingresarPago(req, resp, pedidoDB, existenPagos, idPedido) {
         return __awaiter(this, void 0, void 0, function* () {
             const idCreador = req.usuario._id;
-            const metodo = req.get('metodo');
-            const montoBody = Number(req.body.monto);
-            const monto = parseFloat(montoBody.toFixed(2));
+            const metodo = req.get('metodo'); // id del metodo de pago
+            const monto = Number(req.body.monto);
+            // const monto: number = parseFloat(montoBody.toFixed(2));
             const modalidad = req.body.modalidad;
-            const files = req.files;
+            // const files: UploadedFile = req.files;
             const fecha = (0, moment_1.default)().format('YYYY-MM-DD');
             const query = {};
-            // console.log(files);
-            // return;
-            const respArch = yield (0, archivos_1.extraerArchivo)(files);
-            if (respArch.ok === false) {
-                return resp.json({
-                    ok: false,
-                    mensaje: respArch.mensaje
-                });
-            }
-            else {
-                const file = respArch.data;
-                const resArch = yield (0, archivos_1.subirArchivo)(file, req); // Recibo nombre del archivo
-                if (resArch.ok === false) {
+            const nuevoPago = new pagosModel_1.default({
+                idCreador: idCreador,
+                metodo: metodo,
+                monto: monto,
+                modalidad: modalidad,
+                fecha: fecha,
+            });
+            nuevoPago.save((err, pagoDB) => {
+                if (err) {
+                    // Eliminar pago de pedidos
                     return resp.json({
                         ok: false,
-                        mensaje: resArch.mensaje
+                        mensaje: `No se pudo realizar el pago`,
+                        err
                     });
                 }
-                else {
-                    let total = 0;
-                    const nombre_archivo = resArch.mensaje;
-                    const nuevoPago = new pagosModel_1.default({
-                        idCreador: idCreador,
-                        metodo: metodo,
-                        monto: monto,
-                        modalidad: modalidad,
-                        fecha: fecha,
-                        nombre_archivo: resArch.mensaje
+                pedidoModel_1.default.findByIdAndUpdate(idPedido, { $push: { pagos_pedido: pagoDB._id } }, { new: true })
+                    .populate('pagos_pedido')
+                    .populate('productos_pedidos')
+                    .populate('sucursal')
+                    .exec((err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
+                    if (err) {
+                        return resp.json({
+                            ok: false,
+                            mensaje: `No se pudo agregar el pago al pedido`,
+                            err
+                        });
+                    }
+                    const server = server_1.default.instance;
+                    server.io.emit('recibir-pagos', { ok: true, pedidoDB: pedidoDB });
+                    return resp.json({
+                        ok: true,
+                        mensaje: 'Pedidos ok',
+                        pedidoDB
                     });
-                    if (isNaN(monto) || monto < 0) {
-                        (0, archivos_1.eliminarArchivo)(nombre_archivo);
-                        return resp.json({
-                            ok: false,
-                            mensaje: `Debe ingresar un monto`
-                        });
-                    }
-                    total = parseFloat((pedidoDB.total - monto).toFixed(2));
-                    // total -= monto;
-                    if (total < 0.00) {
-                        (0, archivos_1.eliminarArchivo)(nombre_archivo);
-                        return resp.json({
-                            ok: false,
-                            mensaje: `El monto de pago (${monto.toFixed(2)}) supera el total pendiente, Total pendiente: ${(pedidoDB.total).toFixed(2)}`
-                        });
-                    }
-                    else {
-                        nuevoPago.save((err, pagoDB) => {
-                            if (err) {
-                                // Eliminar pago de pedidos
-                                return resp.json({
-                                    ok: false,
-                                    mensaje: `No se pudo realizar el pago`,
-                                    err
-                                });
-                            }
-                            Object.assign(query, { $push: { pagos_pedido: pagoDB._id }, total: total, monto_itbms: 0, subtotal: 0 });
-                            pedidoModel_1.default.findByIdAndUpdate(idPedido, query, { new: true })
-                                .populate('pagos_pedido')
-                                .exec((err, pedidoActualizadoDB) => __awaiter(this, void 0, void 0, function* () {
-                                if (err) {
-                                    return resp.json({
-                                        ok: false,
-                                        mensaje: `No se pudo agregar el pago al pedido`,
-                                        err
-                                    });
-                                }
-                                return resp.json({
-                                    ok: true,
-                                    pedidoActualizadoDB
-                                });
-                            }));
-                        });
-                    }
-                }
-            }
+                }));
+            });
+            // console.log(files);
+            // return;
+            // const respArch: RespPromise = await extraerArchivo(files);
+            // if (respArch.ok === false) {
+            //     return resp.json({
+            //         ok: false,
+            //         mensaje: respArch.mensaje
+            //     });
+            // } else {
+            //     const file = respArch.data;
+            //     const resArch: RespPromise = await subirArchivo(file, req); // Recibo nombre del archivo
+            //     if (resArch.ok === false) {
+            //         return resp.json({
+            //             ok: false,
+            //             mensaje: resArch.mensaje
+            //         });
+            //     } else {
+            //         let total: number = 0;
+            //         const nombre_archivo = resArch.mensaje;
+            //         const nuevoPago = new pagosModel({
+            //             idCreador: idCreador,
+            //             metodo: metodo,
+            //             monto: monto,
+            //             modalidad: modalidad,
+            //             fecha: fecha,
+            //             // nombre_archivo: resArch.mensaje
+            //         });
+            //         if (isNaN(monto) || monto < 0) {
+            //             eliminarArchivo(nombre_archivo);
+            //             return resp.json({
+            //                 ok: false,
+            //                 mensaje: `Debe ingresar un monto`
+            //             });
+            //         }
+            //         total = parseFloat((pedidoDB.total - monto).toFixed(2));
+            //         // total -= monto;
+            //         if (total < 0.00) {
+            //             eliminarArchivo(nombre_archivo);
+            //             return resp.json({
+            //                 ok: false,
+            //                 mensaje: `El monto de pago (${monto.toFixed(2)}) supera el total pendiente, Total pendiente: ${(pedidoDB.total).toFixed(2)}`
+            //             });
+            //         } else {
+            //             nuevoPago.save((err: CallbackError, pagoDB: PagoInterface) => {
+            //                 if (err) {
+            //                     // Eliminar pago de pedidos
+            //                     return resp.json({
+            //                         ok: false,
+            //                         mensaje: `No se pudo realizar el pago`,
+            //                         err
+            //                     });
+            //                 }
+            //                 Object.assign(query, { $push: { pagos_pedido: pagoDB._id }, total: total, monto_itbms: 0, subtotal: 0 });
+            //                 pedidoModel.findByIdAndUpdate(idPedido, query, { new: true })
+            //                     .populate('pagos_pedido')
+            //                     .exec(async (err: CallbackError, pedidoActualizadoDB: any) => {
+            //                         if (err) {
+            //                             return resp.json({
+            //                                 ok: false,
+            //                                 mensaje: `No se pudo agregar el pago al pedido`,
+            //                                 err
+            //                             });
+            //                         }
+            //                         return resp.json({
+            //                             ok: true,
+            //                             pedidoActualizadoDB
+            //                         });
+            //                     });
+            //             });
+            //         }
+            //     }
+            // }
         });
     }
     obtenerPagoID(req, resp) {
@@ -297,6 +330,51 @@ class PagoClass {
                         });
                     }));
                 });
+            });
+        });
+    }
+    obtenerPagos(req, resp) {
+        pagosModel_1.default.find({})
+            .populate('idCreador')
+            .populate('metodo')
+            .exec((err, pagosDB) => {
+            if (err) {
+                return resp.json({
+                    ok: false,
+                    mensaje: 'Error interno',
+                    err
+                });
+            }
+            return resp.json({
+                ok: true,
+                pagosDB
+            });
+        });
+    }
+    obtenerPagosPorPedido(req, resp) {
+        const pedido = req.get('pedido');
+        pedidoModel_1.default.findById(pedido)
+            .populate({ path: 'productos_pedidos', populate: { path: 'producto' } })
+            .populate('pagos_pedido')
+            .populate({ path: 'pagos_pedido', populate: { path: 'idCreador' } })
+            .populate({ path: 'pagos_pedido', populate: { path: 'metodo' } })
+            .exec((err, pedidoDB) => {
+            if (err) {
+                return resp.json({
+                    ok: false,
+                    mensaje: `Error interno`,
+                    err
+                });
+            }
+            if (!pedidoDB) {
+                return resp.json({
+                    ok: false,
+                    mensaje: `No se encontró un pedido`
+                });
+            }
+            return resp.json({
+                ok: true,
+                pedidoDB: pedidoDB
             });
         });
     }
