@@ -35,4 +35,10 @@ pagoRoute.put('/deshabilitarPago', [verificaToken], (req: Request, resp: Respons
     deshabilitarPago.deshabilitarPago(req, resp);
 });
 
+pagoRoute.put('/desactivarPago', [verificaToken], (req: Request, resp: Response) => {
+
+    const desactivarPago = new PagoClass();
+    desactivarPago.desactivarPago(req, resp);
+});
+
 export default pagoRoute;

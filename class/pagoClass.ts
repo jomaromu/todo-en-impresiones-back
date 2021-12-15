@@ -419,6 +419,57 @@ export class PagoClass {
         });
     }
 
+    desactivarPago(req: any, resp: Response): void {
+
+        const pedido = req.get('pedido');
+        const motivo = req.get('motivo');
+        const idPago = req.get('idPago');
+
+        pedidoModel.findById(pedido)
+            .exec((err: any, pedidoDB: any) => {
+
+                if (err) {
+                    return resp.json({
+                        ok: false,
+                        mensaje: `Error interno`,
+                        err
+                    });
+                }
+
+                if (!pedidoDB) {
+                    return resp.json({
+                        ok: false,
+                        mensaje: `No se encontró un pedido`
+                    });
+                }
+
+                pagosModel.findByIdAndUpdate(idPago, { motivo, estado: false }, { new: true })
+                    .exec((err: any, pagoDB: any) => {
+
+                        if (err) {
+                            return resp.json({
+                                ok: false,
+                                mensaje: `Error interno`,
+                                err
+                            });
+                        }
+
+                        if (!pagoDB) {
+                            return resp.json({
+                                ok: false,
+                                mensaje: `No se encontró un pago`
+                            });
+                        }
+
+                        return resp.json({
+                            ok: true,
+                            pagoDB,
+                            mensaje: `Pago actuaizado`
+                        });
+                    });
+            });
+    }
+
     obtenerPagos(req: any, resp: Response): any {
 
         pagosModel.find({})

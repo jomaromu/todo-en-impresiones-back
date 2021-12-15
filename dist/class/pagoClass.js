@@ -333,6 +333,48 @@ class PagoClass {
             });
         });
     }
+    desactivarPago(req, resp) {
+        const pedido = req.get('pedido');
+        const motivo = req.get('motivo');
+        const idPago = req.get('idPago');
+        pedidoModel_1.default.findById(pedido)
+            .exec((err, pedidoDB) => {
+            if (err) {
+                return resp.json({
+                    ok: false,
+                    mensaje: `Error interno`,
+                    err
+                });
+            }
+            if (!pedidoDB) {
+                return resp.json({
+                    ok: false,
+                    mensaje: `No se encontró un pedido`
+                });
+            }
+            pagosModel_1.default.findByIdAndUpdate(idPago, { motivo, estado: false }, { new: true })
+                .exec((err, pagoDB) => {
+                if (err) {
+                    return resp.json({
+                        ok: false,
+                        mensaje: `Error interno`,
+                        err
+                    });
+                }
+                if (!pagoDB) {
+                    return resp.json({
+                        ok: false,
+                        mensaje: `No se encontró un pago`
+                    });
+                }
+                return resp.json({
+                    ok: true,
+                    pagoDB,
+                    mensaje: `Pago actuaizado`
+                });
+            });
+        });
+    }
     obtenerPagos(req, resp) {
         pagosModel_1.default.find({})
             .populate('idCreador')

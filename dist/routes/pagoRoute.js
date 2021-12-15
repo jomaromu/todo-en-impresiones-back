@@ -24,4 +24,8 @@ pagoRoute.put('/deshabilitarPago', [auth_1.verificaToken], (req, resp) => {
     const deshabilitarPago = new pagoClass_1.PagoClass();
     deshabilitarPago.deshabilitarPago(req, resp);
 });
+pagoRoute.put('/desactivarPago', [auth_1.verificaToken], (req, resp) => {
+    const desactivarPago = new pagoClass_1.PagoClass();
+    desactivarPago.desactivarPago(req, resp);
+});
 exports.default = pagoRoute;
