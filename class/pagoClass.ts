@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { CallbackError } from 'mongoose';
 import moment from 'moment';
-import { UploadedFile } from 'express-fileupload';
+// import { UploadedFile } from 'express-fileupload';
 moment.locale('es');
 
 // Intefaces
@@ -13,7 +13,7 @@ import pagosModel from '../models/pagosModel';
 import pedidoModel from '../models/pedidoModel';
 
 // Funciones externas
-import { eliminarArchivo, extraerArchivo, subirArchivo } from '../functions/archivos';
+// import { eliminarArchivo, extraerArchivo, subirArchivo } from '../functions/archivos';
 import Server from './server';
 
 export class PagoClass {
@@ -116,7 +116,7 @@ export class PagoClass {
             }
 
             pedidoModel.findByIdAndUpdate(idPedido, { $push: { pagos_pedido: pagoDB._id } }, { new: true })
-                .populate('pagos_pedido')
+                .populate({ path: 'pagos_pedido', populate: 'idCreador metodo' })
                 .populate('productos_pedidos')
                 .populate('sucursal')
                 .exec(async (err: CallbackError, pedidoDB: any) => {
@@ -461,11 +461,35 @@ export class PagoClass {
                             });
                         }
 
-                        return resp.json({
-                            ok: true,
-                            pagoDB,
-                            mensaje: `Pago actuaizado`
-                        });
+
+                        pedidoModel.findByIdAndUpdate(pedido, {}, { new: true })
+                            .populate({ path: 'pagos_pedido', populate: 'idCreador metodo' })
+                            .populate('productos_pedidos')
+                            .populate('sucursal')
+                            .exec(async (err: CallbackError, pedidoDB: any) => {
+
+                                if (err) {
+                                    return resp.json({
+                                        ok: false,
+                                        mensaje: `No se pudo agregar el pago al pedido`,
+                                        err
+                                    });
+                                }
+
+                                const server = Server.instance;
+                                server.io.emit('recibir-pagos', { ok: true, pedidoDB: pedidoDB });
+
+                                return resp.json({
+                                    ok: true,
+                                    mensaje: 'Pedidos ok',
+                                    pedidoDB
+                                });
+                            });
+                        // return resp.json({
+                        //     ok: true,
+                        //     pagoDB,
+                        //     mensaje: `Pago actuaizado`
+                        // });
                     });
             });
     }
@@ -518,6 +542,9 @@ export class PagoClass {
                         mensaje: `No se encontró un pedido`
                     });
                 }
+
+                const server = Server.instance;
+                server.io.emit('recibir-pagos', { ok: true, pedidoDB: pedidoDB });
 
                 return resp.json({
                     ok: true,

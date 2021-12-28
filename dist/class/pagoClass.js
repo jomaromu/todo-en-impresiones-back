@@ -14,10 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PagoClass = void 0;
 const moment_1 = __importDefault(require("moment"));
+// import { UploadedFile } from 'express-fileupload';
 moment_1.default.locale('es');
 // Modelos
 const pagosModel_1 = __importDefault(require("../models/pagosModel"));
 const pedidoModel_1 = __importDefault(require("../models/pedidoModel"));
+// Funciones externas
+// import { eliminarArchivo, extraerArchivo, subirArchivo } from '../functions/archivos';
 const server_1 = __importDefault(require("./server"));
 class PagoClass {
     constructor() { }
@@ -96,7 +99,7 @@ class PagoClass {
                     });
                 }
                 pedidoModel_1.default.findByIdAndUpdate(idPedido, { $push: { pagos_pedido: pagoDB._id } }, { new: true })
-                    .populate('pagos_pedido')
+                    .populate({ path: 'pagos_pedido', populate: 'idCreador metodo' })
                     .populate('productos_pedidos')
                     .populate('sucursal')
                     .exec((err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
@@ -367,11 +370,31 @@ class PagoClass {
                         mensaje: `No se encontró un pago`
                     });
                 }
-                return resp.json({
-                    ok: true,
-                    pagoDB,
-                    mensaje: `Pago actuaizado`
-                });
+                pedidoModel_1.default.findByIdAndUpdate(pedido, {}, { new: true })
+                    .populate({ path: 'pagos_pedido', populate: 'idCreador metodo' })
+                    .populate('productos_pedidos')
+                    .populate('sucursal')
+                    .exec((err, pedidoDB) => __awaiter(this, void 0, void 0, function* () {
+                    if (err) {
+                        return resp.json({
+                            ok: false,
+                            mensaje: `No se pudo agregar el pago al pedido`,
+                            err
+                        });
+                    }
+                    const server = server_1.default.instance;
+                    server.io.emit('recibir-pagos', { ok: true, pedidoDB: pedidoDB });
+                    return resp.json({
+                        ok: true,
+                        mensaje: 'Pedidos ok',
+                        pedidoDB
+                    });
+                }));
+                // return resp.json({
+                //     ok: true,
+                //     pagoDB,
+                //     mensaje: `Pago actuaizado`
+                // });
             });
         });
     }
@@ -414,6 +437,8 @@ class PagoClass {
                     mensaje: `No se encontró un pedido`
                 });
             }
+            const server = server_1.default.instance;
+            server.io.emit('recibir-pagos', { ok: true, pedidoDB: pedidoDB });
             return resp.json({
                 ok: true,
                 pedidoDB: pedidoDB

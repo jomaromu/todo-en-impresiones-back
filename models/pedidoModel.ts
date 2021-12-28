@@ -31,7 +31,7 @@ const PedidoSchema = new Schema({
     pagos_pedido: [{ type: Schema.Types.ObjectId, ref: 'pagos' }],
     estado: { type: Boolean, default: true },
     estado_pedido: { type: Number, default: 0 }, // 'Normal', 'Cambios', 'Aprobados', 'Corregir', 'Impreso'
-    itbms: { type: Boolean, default: false },
+    itbms: { type: Boolean, default: true },
     // monto_itbms: { type: Number, default: 0 },
     subtotal: { type: Number, default: 0 },
     // saldo: { type: Number, default: 0 },

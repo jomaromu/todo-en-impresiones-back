@@ -29,7 +29,8 @@ const WorkerUserSchema = new Schema({
     cantVisitas: { type: Number, default: 0 },
     estado: { type: Boolean, default: true },
     sucursal: { type: mongoose.Types.ObjectId, ref: 'sucursales' },
-    permitidas: [{ type: mongoose.Types.ObjectId, ref: 'sucursales' }]
+    permitidas: [{ type: mongoose.Types.ObjectId, ref: 'sucursales' }],
+    pedidos: [{ type: mongoose.Types.ObjectId, ref: 'pedidos' }]
 });
 
 // validacion para único elemento
