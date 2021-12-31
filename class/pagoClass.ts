@@ -134,7 +134,7 @@ export class PagoClass {
 
                     return resp.json({
                         ok: true,
-                        mensaje: 'Pedidos ok',
+                        mensaje: 'Pedidos ok', 
                         pedidoDB
                     });
                 });
