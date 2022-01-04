@@ -182,7 +182,7 @@ export class PedidosClass {
             }
 
             const actualizarPedido = () => {
-                pedidoModel.findByIdAndUpdate(id, query, { new: true }) 
+                pedidoModel.findByIdAndUpdate(id, query, { new: true })
                     .populate('sucursal')
                     // .populate('etapa_pedido')
                     // .populate('prioridad_pedido')
@@ -577,7 +577,7 @@ export class PedidosClass {
         };
 
         if (role === environmnet.colRole.VendedorNormalRole) {
-            match.$match = { $and: [{ 'IDCreador._id': new mongoose.Types.ObjectId(idUsuario) }] }
+            match.$match = { 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }
         }
 
         if (role === environmnet.colRole.produccionNormal) {
@@ -585,7 +585,7 @@ export class PedidosClass {
         }
 
         if (role === environmnet.colRole.produccionVIP) {
-            match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }, { 'etapa_pedido': 2 }] }
+            match.$match = { 'etapa_pedido': 2 }
         }
 
         if (role === environmnet.colRole.DiseniadorRole) {

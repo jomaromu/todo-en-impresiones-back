@@ -476,13 +476,13 @@ class PedidosClass {
                 $match: {}
             };
             if (role === environment_1.environmnet.colRole.VendedorNormalRole) {
-                match.$match = { $and: [{ 'IDCreador._id': new mongoose.Types.ObjectId(idUsuario) }] };
+                match.$match = { 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) };
             }
             if (role === environment_1.environmnet.colRole.produccionNormal) {
                 match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }, { 'etapa_pedido': 2 }] };
             }
             if (role === environment_1.environmnet.colRole.produccionVIP) {
-                match.$match = { $and: [{ 'sucursal': new mongoose.Types.ObjectId(idSucursalWorker) }, { 'etapa_pedido': 2 }] };
+                match.$match = { 'etapa_pedido': 2 };
             }
             if (role === environment_1.environmnet.colRole.DiseniadorRole) {
                 match.$match = { $and: [{ 'etapa_pedido': 1 }, { 'AsignadoA._id': new mongoose.Types.ObjectId(idUsuario) }] };
